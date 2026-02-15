@@ -25,6 +25,7 @@ namespace AvalonDock.Layout
 		#region fields
 
 		private LayoutDocumentPaneGroup _rootPanel = null;
+		private string _title;
 
 		[NonSerialized]
 		private bool _isVisible = true;
@@ -34,6 +35,16 @@ namespace AvalonDock.Layout
 		public event EventHandler IsVisibleChanged;
 
 		#region Properties
+
+		#region Title
+
+		public string Title
+		{
+			get => _title;
+			set { if (_title != value) { _title = value; RaisePropertyChanged(nameof(Title)); } }
+		}
+
+		#endregion Title
 
 		#region RootPanel
 
@@ -133,6 +144,9 @@ namespace AvalonDock.Layout
 		public override void ReadXml(XmlReader reader)
 		{
 			reader.MoveToContent();
+			if (reader.MoveToAttribute(nameof(Title)))
+				Title = reader.Value;
+			reader.MoveToContent();
 			if (reader.IsEmptyElement)
 			{
 				reader.Read();
@@ -164,6 +178,14 @@ namespace AvalonDock.Layout
 			}
 
 			reader.ReadEndElement();
+		}
+
+		/// <inheritdoc />
+		public override void WriteXml(XmlWriter writer)
+		{
+			if (!string.IsNullOrEmpty(Title))
+				writer.WriteAttributeString(nameof(Title), Title);
+			base.WriteXml(writer);
 		}
 
 #if TRACE

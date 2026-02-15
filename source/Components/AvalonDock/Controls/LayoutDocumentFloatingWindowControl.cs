@@ -42,6 +42,14 @@ namespace AvalonDock.Controls
 		static LayoutDocumentFloatingWindowControl()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutDocumentFloatingWindowControl), new FrameworkPropertyMetadata(typeof(LayoutDocumentFloatingWindowControl)));
+			TitleProperty.OverrideMetadata(typeof(LayoutDocumentFloatingWindowControl), new FrameworkPropertyMetadata(OnWindowTitleChanged));
+		}
+
+		/// <summary>Syncs Window.Title changes to the model for layout persistence.</summary>
+		private static void OnWindowTitleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			if (d is LayoutDocumentFloatingWindowControl ctrl && ctrl._model != null)
+				ctrl._model.Title = (string)e.NewValue;
 		}
 
 		/// <summary>
@@ -119,6 +127,7 @@ namespace AvalonDock.Controls
 
 		private TextBox _titleEditor;
 		private FrameworkElement _titleTextElement;
+		private ContentPresenter _titleContentPresenter;
 
 		/// <inheritdoc />
 		public override void OnApplyTemplate()
@@ -128,11 +137,17 @@ namespace AvalonDock.Controls
 			// VS2013 theme uses PART_TitleText (TextBlock), other themes use PART_TitleContent (Border or ContentPresenter)
 			_titleTextElement = GetTemplateChild("PART_TitleText") as FrameworkElement
 				?? GetTemplateChild("PART_TitleContent") as FrameworkElement;
+			// Cache the ContentPresenter that displays the document title (non-VS2013 themes)
+			_titleContentPresenter = _titleTextElement as ContentPresenter
+				?? _titleTextElement?.FindVisualChildren<ContentPresenter>().FirstOrDefault();
 			if (_titleEditor != null)
 			{
 				_titleEditor.KeyDown += TitleEditor_KeyDown;
 				_titleEditor.LostFocus += TitleEditor_LostFocus;
 			}
+			// Apply custom title to the display if set (persisted or from event handler)
+			if (!string.IsNullOrEmpty(_model.Title))
+				ApplyCustomTitleToDisplay(_model.Title);
 		}
 
 		private void TitleEditor_KeyDown(object sender, KeyEventArgs e)
@@ -158,7 +173,13 @@ namespace AvalonDock.Controls
 		private void BeginEditTitle()
 		{
 			if (_titleEditor == null) return;
-			_titleEditor.Text = Title;
+			// Show the currently displayed title so the editor matches what the user sees
+			string displayedTitle = null;
+			if (_titleTextElement is System.Windows.Controls.TextBlock tb)
+				displayedTitle = tb.Text;  // VS2013: TextBlock bound to Window.Title
+			else if (_model.IsSinglePane)
+				displayedTitle = _model.SinglePane?.SelectedContent?.Title;  // Other themes: document title
+			_titleEditor.Text = displayedTitle ?? Title;
 			IsEditingTitle = true;
 			_titleEditor.SelectAll();
 			_titleEditor.Focus();
@@ -166,8 +187,11 @@ namespace AvalonDock.Controls
 
 		private void CommitEditTitle()
 		{
-			if (_titleEditor != null)
+			if (_titleEditor != null && !string.IsNullOrWhiteSpace(_titleEditor.Text))
+			{
 				Title = _titleEditor.Text;
+				ApplyCustomTitleToDisplay(_titleEditor.Text);
+			}
 			IsEditingTitle = false;
 		}
 
@@ -176,6 +200,17 @@ namespace AvalonDock.Controls
 			if (_titleEditor != null)
 				_titleEditor.Text = Title;
 			IsEditingTitle = false;
+		}
+
+		/// <summary>Updates the title display for themes that use a ContentPresenter (non-VS2013) instead of a TextBlock bound to Window.Title.</summary>
+		private void ApplyCustomTitleToDisplay(string title)
+		{
+			if (_titleContentPresenter != null)
+			{
+				_titleContentPresenter.ContentTemplate = null;
+				_titleContentPresenter.ContentTemplateSelector = null;
+				_titleContentPresenter.Content = title;
+			}
 		}
 
 		private bool IsHitOnTitleText()
@@ -196,6 +231,8 @@ namespace AvalonDock.Controls
 		protected override void OnInitialized(EventArgs e)
 		{
 			base.OnInitialized(e);
+			if (!string.IsNullOrEmpty(_model.Title))
+				Title = _model.Title;
 			var manager = _model.Root.Manager;
 			Content = manager.CreateUIElementForModel(_model.RootPanel);
 			// TODO IsVisibleChanged
