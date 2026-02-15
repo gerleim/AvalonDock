@@ -245,10 +245,7 @@ namespace AvalonDock.Controls
 					}
 					break;
 			}
-			var wasHandled = handled;
-			var result = base.FilterMessage(hwnd, msg, wParam, lParam, ref handled);
-			if (wasHandled) handled = true;
-			return result;
+			return base.FilterMessage(hwnd, msg, wParam, lParam, ref handled);
 		}
 
 		/// <inheritdoc />
