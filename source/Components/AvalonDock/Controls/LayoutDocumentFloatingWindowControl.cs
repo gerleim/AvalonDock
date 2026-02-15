@@ -199,6 +199,7 @@ namespace AvalonDock.Controls
 					{
 						Dispatcher.BeginInvoke(new Action(BeginEditTitle));
 						handled = true;
+						return IntPtr.Zero;
 					}
 					break;
 
