@@ -26,6 +26,9 @@
 		<ResourceDictionary Source="Brushes.xaml" />
 	</ResourceDictionary.MergedDictionaries>
 
+	<PathGeometry x:Key="DockingLockLocked" Figures="M 1.77411,12.4183L 23.0627,12.4183C 24.0423,12.4183 24.8366,13.2126 24.8366,14.1925L 24.8366,30.1588C 24.8366,31.1386 24.0423,31.9329 23.0627,31.9329L 1.77411,31.9329C 0.794312,31.9329 0,31.1386 0,30.1588L 0,14.1925C 0,13.2126 0.794312,12.4183 1.77411,12.4183 Z M 14.5149,22.095C 15.0955,21.6111 15.4826,20.9337 15.4826,20.1595C 15.4826,18.805 14.4182,17.7404 13.0635,17.7404C 11.7087,17.7404 10.6442,18.8048 10.6442,20.1595C 10.6442,20.9337 11.0313,21.6111 11.6119,22.095L 11.6119,24.0302C 11.6119,24.8044 12.2893,25.4818 13.0633,25.4818C 13.8375,25.4818 14.5149,24.8044 14.5149,24.0302L 14.5149,22.095 Z M 20.9659,12.4183L 18.063,12.4183L 18.063,8.70894C 18.063,5.51565 15.4504,2.90304 12.257,2.90304C 9.06372,2.90304 6.45111,5.51565 6.45111,8.70894L 6.45111,12.4183L 3.54816,12.4183L 3.54816,8.70894C 3.54816,3.87069 7.41882,2.03401e-005 12.257,2.03401e-005C 17.0955,2.03401e-005 20.9659,3.87069 20.9659,8.70894L 20.9659,12.4183 Z" />
+	<PathGeometry x:Key="DockingLockUnlocked" Figures="M 1.77411,12.4183L 23.0627,12.4183C 24.0423,12.4183 24.8366,13.2126 24.8366,14.1925L 24.8366,30.1588C 24.8366,31.1386 24.0423,31.9329 23.0627,31.9329L 1.77411,31.9329C 0.794312,31.9329 0,31.1386 0,30.1588L 0,14.1925C 0,13.2126 0.794312,12.4183 1.77411,12.4183 Z M 14.5149,22.095C 15.0955,21.6111 15.4826,20.9337 15.4826,20.1595C 15.4826,18.805 14.4182,17.7404 13.0635,17.7404C 11.7087,17.7404 10.6442,18.8048 10.6442,20.1595C 10.6442,20.9337 11.0313,21.6111 11.6119,22.095L 11.6119,24.0302C 11.6119,24.8044 12.2893,25.4818 13.0633,25.4818C 13.8375,25.4818 14.5149,24.8044 14.5149,24.0302L 14.5149,22.095 Z M 20.9659,6L 18.063,6L 18.063,8.70894C 18.063,5.51565 15.4504,2.90304 12.257,2.90304C 9.06372,2.90304 6.45111,5.51565 6.45111,8.70894L 6.45111,12.4183L 3.54816,12.4183L 3.54816,8.70894C 3.54816,3.87069 7.41882,2.03401e-005 12.257,2.03401e-005C 17.0955,2.03401e-005 20.9659,3.87069 20.9659,8.70894L 20.9659,6 Z" />
+
 	<!--  DocumentPaneControlStyle  -->
 	<Style x:Key="AvalonDock_ThemeAero_DocumentPaneControlStyle" TargetType="{x:Type avalonDockControls:LayoutDocumentPaneControl}">
 		<Setter Property="Background" Value="{DynamicResource {x:Static avalonDockAero:AeroColors.BaseColor8Key}}" />
@@ -1222,6 +1225,7 @@
 											<ColumnDefinition Width="*" />
 											<ColumnDefinition Width="Auto" />
 											<ColumnDefinition Width="Auto" />
+											<ColumnDefinition Width="Auto" />
 										</Grid.ColumnDefinitions>
 										<ContentPresenter
 											x:Name="PART_TitleContent"
@@ -1239,9 +1243,27 @@
 											BorderThickness="0,0,0,1"
 											CaretBrush="{TemplateBinding TextElement.Foreground}" />
 
+										<ToggleButton
+											x:Name="PART_DockingLock"
+											Grid.Column="1"
+											shell:WindowChrome.IsHitTestVisibleInChrome="True"
+											IsChecked="{Binding IsDockingLocked, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+											Focusable="False"
+											Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
+											ToolTip="Lock docking">
+											<Path
+												x:Name="PART_ImgDockingLock"
+												Width="9"
+												Height="9"
+												VerticalAlignment="Center"
+												Data="{StaticResource DockingLockUnlocked}"
+												Fill="{Binding (TextElement.Foreground), RelativeSource={RelativeSource Self}}"
+												Stretch="Uniform" />
+										</ToggleButton>
+
 										<Button
 											x:Name="PART_PinMaximize"
-											Grid.Column="1"
+											Grid.Column="2"
 											shell:WindowChrome.IsHitTestVisibleInChrome="True"
 											Command="{x:Static shell:SystemCommands.MaximizeWindowCommand}"
 											CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
@@ -1257,7 +1279,7 @@
 
 										<Button
 											x:Name="PART_PinRestore"
-											Grid.Column="1"
+											Grid.Column="2"
 											shell:WindowChrome.IsHitTestVisibleInChrome="True"
 											Command="{x:Static shell:SystemCommands.RestoreWindowCommand}"
 											CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
@@ -1273,7 +1295,7 @@
 
 										<Button
 											x:Name="PART_PinClose"
-											Grid.Column="2"
+											Grid.Column="3"
 											shell:WindowChrome.IsHitTestVisibleInChrome="True"
 											Command="{Binding Path=CloseWindowCommand, RelativeSource={RelativeSource TemplatedParent}}"
 											Focusable="False"
@@ -1292,6 +1314,10 @@
 						</Border>
 					</Grid>
 					<ControlTemplate.Triggers>
+						<Trigger Property="IsDockingLocked" Value="True">
+							<Setter TargetName="PART_ImgDockingLock" Property="Data" Value="{StaticResource DockingLockLocked}" />
+							<Setter TargetName="PART_DockingLock" Property="ToolTip" Value="Unlock docking" />
+						</Trigger>
 						<Trigger Property="WindowState" Value="Maximized">
 							<Setter TargetName="WindowBorder" Property="Padding" Value="3" />
 						</Trigger>
@@ -1361,6 +1387,7 @@
 											<ColumnDefinition Width="Auto" />
 											<ColumnDefinition Width="Auto" />
 											<ColumnDefinition Width="Auto" />
+											<ColumnDefinition Width="Auto" />
 										</Grid.ColumnDefinitions>
 
 										<Border Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
@@ -1393,9 +1420,27 @@
 												Stretch="None" />
 										</avalonDockControls:DropDownButton>
 
+										<ToggleButton
+											x:Name="PART_DockingLock"
+											Grid.Column="2"
+											shell:WindowChrome.IsHitTestVisibleInChrome="True"
+											IsChecked="{Binding IsDockingLocked, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+											Focusable="False"
+											Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
+											ToolTip="Lock docking">
+											<Path
+												x:Name="PART_ImgDockingLock"
+												Width="9"
+												Height="9"
+												VerticalAlignment="Center"
+												Data="{StaticResource DockingLockUnlocked}"
+												Fill="{Binding (TextElement.Foreground), RelativeSource={RelativeSource Self}}"
+												Stretch="Uniform" />
+										</ToggleButton>
+
 										<Button
 											x:Name="PART_PinMaximize"
-											Grid.Column="2"
+											Grid.Column="3"
 											HorizontalAlignment="Center"
 											VerticalAlignment="Center"
 											HorizontalContentAlignment="Center"
@@ -1415,7 +1460,7 @@
 
 										<Button
 											x:Name="PART_PinRestore"
-											Grid.Column="2"
+											Grid.Column="3"
 											HorizontalAlignment="Center"
 											VerticalAlignment="Center"
 											shell:WindowChrome.IsHitTestVisibleInChrome="True"
@@ -1433,7 +1478,7 @@
 
 										<Button
 											x:Name="PART_PinClose"
-											Grid.Column="3"
+											Grid.Column="4"
 											HorizontalAlignment="Center"
 											VerticalAlignment="Center"
 											shell:WindowChrome.IsHitTestVisibleInChrome="True"
@@ -1454,6 +1499,10 @@
 						</Border>
 					</Grid>
 					<ControlTemplate.Triggers>
+						<Trigger Property="IsDockingLocked" Value="True">
+							<Setter TargetName="PART_ImgDockingLock" Property="Data" Value="{StaticResource DockingLockLocked}" />
+							<Setter TargetName="PART_DockingLock" Property="ToolTip" Value="Unlock docking" />
+						</Trigger>
 						<Trigger Property="WindowState" Value="Maximized">
 							<Setter TargetName="WindowBorder" Property="Padding" Value="3" />
 						</Trigger>
