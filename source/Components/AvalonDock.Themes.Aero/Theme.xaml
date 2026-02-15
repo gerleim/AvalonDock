@@ -1224,9 +1224,20 @@
 											<ColumnDefinition Width="Auto" />
 										</Grid.ColumnDefinitions>
 										<ContentPresenter
+											x:Name="PART_TitleContent"
 											Content="{Binding Model.SinglePane.SelectedContent, RelativeSource={RelativeSource TemplatedParent}}"
 											ContentTemplate="{Binding Model.Root.Manager.DocumentTitleTemplate, RelativeSource={RelativeSource TemplatedParent}}"
 											ContentTemplateSelector="{Binding Model.Root.Manager.DocumentTitleTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}" />
+										<TextBox x:Name="PART_TitleEditor"
+											Margin="2,0,2,0"
+											VerticalAlignment="Center"
+											HorizontalAlignment="Left"
+											shell:WindowChrome.IsHitTestVisibleInChrome="True"
+											Visibility="Collapsed"
+											Background="Transparent"
+											Foreground="{TemplateBinding TextElement.Foreground}"
+											BorderThickness="0,0,0,1"
+											CaretBrush="{TemplateBinding TextElement.Foreground}" />
 
 										<Button
 											x:Name="PART_PinMaximize"
@@ -1298,6 +1309,10 @@
 						</Trigger>
 						<Trigger SourceName="PART_PinClose" Property="IsMouseOver" Value="True">
 							<Setter TargetName="PART_ImgPinClose" Property="Source" Value="Images/PinClose_Black.png" />
+						</Trigger>
+						<Trigger Property="IsEditingTitle" Value="True">
+							<Setter TargetName="PART_TitleContent" Property="Visibility" Value="Collapsed" />
+							<Setter TargetName="PART_TitleEditor" Property="Visibility" Value="Visible" />
 						</Trigger>
 
 					</ControlTemplate.Triggers>

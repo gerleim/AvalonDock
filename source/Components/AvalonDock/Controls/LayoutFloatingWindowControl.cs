@@ -146,6 +146,23 @@ namespace AvalonDock.Controls
 
 		#endregion IsDragging
 
+		#region IsDockingLocked
+
+		/// <summary><see cref="IsDockingLocked"/> dependency property.</summary>
+		public static readonly DependencyProperty IsDockingLockedProperty =
+			DependencyProperty.Register(nameof(IsDockingLocked), typeof(bool),
+				typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(false));
+
+		/// <summary>Gets/sets whether docking is locked for this floating window. When locked, the window can be moved freely but won't show dock target indicators.</summary>
+		[Bindable(true), Description("Gets/sets whether docking is locked for this floating window."), Category("FloatingWindow")]
+		public bool IsDockingLocked
+		{
+			get => (bool)GetValue(IsDockingLockedProperty);
+			set => SetValue(IsDockingLockedProperty, value);
+		}
+
+		#endregion IsDockingLocked
+
 		#region CloseInitiatedByUser
 
 		protected bool CloseInitiatedByUser => !_internalCloseFlag;

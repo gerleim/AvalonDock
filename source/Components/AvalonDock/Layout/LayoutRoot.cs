@@ -402,7 +402,7 @@ namespace AvalonDock.Layout
 						continue;
 
 					//...if this empty pane is not referenced by anyone, then remove it from its parent container
-					if (!this.Descendents().OfType<ILayoutPreviousContainer>().Any(c => c.PreviousContainer == emptyPane))
+					if (!this.Descendents().OfType<ILayoutPreviousContainer>().Any(c => c.PreviousContainer == emptyPane && !(c is LayoutContent lc && lc.IsFloating)))
 					{
 						var parentGroup = emptyPane.Parent;
 						parentGroup.RemoveChild(emptyPane);

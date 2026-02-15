@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
@@ -100,6 +101,79 @@ namespace AvalonDock.Controls
 
 		#endregion SingleContentLayoutItem
 
+		#region IsEditingTitle
+
+		/// <summary><see cref="IsEditingTitle"/> dependency property.</summary>
+		public static readonly DependencyProperty IsEditingTitleProperty =
+			DependencyProperty.Register(nameof(IsEditingTitle), typeof(bool),
+				typeof(LayoutDocumentFloatingWindowControl), new PropertyMetadata(false));
+
+		/// <summary>Gets or sets whether the title is currently being edited inline.</summary>
+		public bool IsEditingTitle
+		{
+			get => (bool)GetValue(IsEditingTitleProperty);
+			set => SetValue(IsEditingTitleProperty, value);
+		}
+
+		#endregion IsEditingTitle
+
+		private TextBox _titleEditor;
+
+		/// <inheritdoc />
+		public override void OnApplyTemplate()
+		{
+			base.OnApplyTemplate();
+			_titleEditor = GetTemplateChild("PART_TitleEditor") as TextBox;
+			if (_titleEditor != null)
+			{
+				_titleEditor.KeyDown += TitleEditor_KeyDown;
+				_titleEditor.LostFocus += TitleEditor_LostFocus;
+			}
+		}
+
+		private void TitleEditor_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Enter || e.Key == Key.Tab)
+			{
+				CommitEditTitle();
+				e.Handled = true;
+			}
+			else if (e.Key == Key.Escape)
+			{
+				CancelEditTitle();
+				e.Handled = true;
+			}
+		}
+
+		private void TitleEditor_LostFocus(object sender, RoutedEventArgs e)
+		{
+			if (IsEditingTitle)
+				CommitEditTitle();
+		}
+
+		private void BeginEditTitle()
+		{
+			if (_titleEditor == null) return;
+			_titleEditor.Text = Title;
+			IsEditingTitle = true;
+			_titleEditor.SelectAll();
+			_titleEditor.Focus();
+		}
+
+		private void CommitEditTitle()
+		{
+			if (_titleEditor != null)
+				Title = _titleEditor.Text;
+			IsEditingTitle = false;
+		}
+
+		private void CancelEditTitle()
+		{
+			if (_titleEditor != null)
+				_titleEditor.Text = Title;
+			IsEditingTitle = false;
+		}
+
 		protected override void OnInitialized(EventArgs e)
 		{
 			base.OnInitialized(e);
@@ -120,6 +194,19 @@ namespace AvalonDock.Controls
 		{
 			switch (msg)
 			{
+				case Win32Helper.WM_NCLBUTTONDBLCLK:
+					if (wParam.ToInt32() == Win32Helper.HT_CAPTION)
+					{
+						Dispatcher.BeginInvoke(new Action(BeginEditTitle));
+						handled = true;
+					}
+					break;
+
+				case Win32Helper.WM_NCLBUTTONDOWN:
+					if (IsEditingTitle && wParam.ToInt32() == Win32Helper.HT_CAPTION)
+						CommitEditTitle();
+					break;
+
 				case Win32Helper.WM_ACTIVATE:
 					var isInactive = ((int)wParam & 0xFFFF) == Win32Helper.WA_INACTIVE;
 					if (_model.IsSinglePane)
@@ -140,13 +227,9 @@ namespace AvalonDock.Controls
 						var windowChrome = WindowChrome.GetWindowChrome(this);
 						if (windowChrome != null)
 						{
-							if (OpenContextMenu())
-								handled = true;
-
-							if (_model.Root.Manager.ShowSystemMenu)
-								windowChrome.ShowSystemMenu = !handled;
-							else
-								windowChrome.ShowSystemMenu = false;
+							ShowTitleBarContextMenu();
+							handled = true;
+							windowChrome.ShowSystemMenu = false;
 						}
 					}
 					break;
@@ -162,7 +245,10 @@ namespace AvalonDock.Controls
 					}
 					break;
 			}
-			return base.FilterMessage(hwnd, msg, wParam, lParam, ref handled);
+			var wasHandled = handled;
+			var result = base.FilterMessage(hwnd, msg, wParam, lParam, ref handled);
+			if (wasHandled) handled = true;
+			return result;
 		}
 
 		/// <inheritdoc />
@@ -203,6 +289,16 @@ namespace AvalonDock.Controls
 			ctxMenu.DataContext = SingleContentLayoutItem;
 			ctxMenu.IsOpen = true;
 			return true;
+		}
+
+		private void ShowTitleBarContextMenu()
+		{
+			var menu = new ContextMenu();
+			var editItem = new MenuItem { Header = "Edit Title" };
+			editItem.Click += (s, e) => BeginEditTitle();
+			menu.Items.Add(editItem);
+			menu.Placement = PlacementMode.MousePoint;
+			menu.IsOpen = true;
 		}
 
 		/// <inheritdoc />

@@ -2914,7 +2914,7 @@ namespace AvalonDock
 			//fwc.SetParentToMainWindowOf(this);
 			_fwList.Add(fwc);
 			Layout.CollectGarbage();
-			UpdateLayout();
+			InvalidateArrange();
 			return fwc;
 		}
 

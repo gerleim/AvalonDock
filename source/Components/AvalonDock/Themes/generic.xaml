@@ -961,7 +961,7 @@
 										<ColumnDefinition Width="Auto" />
 										<ColumnDefinition Width="Auto" />
 									</Grid.ColumnDefinitions>
-									<Border Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
+									<Border x:Name="PART_TitleContent" Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
 										<avalonDockControls:DropDownControlArea DropDownContextMenu="{Binding Model.Root.Manager.DocumentContextMenu, RelativeSource={RelativeSource TemplatedParent}}" DropDownContextMenuDataContext="{Binding Path=SingleContentLayoutItem, RelativeSource={RelativeSource TemplatedParent}}">
 											<ContentPresenter
 												Content="{Binding Model.SinglePane.SelectedContent, RelativeSource={RelativeSource TemplatedParent}}"
@@ -969,6 +969,16 @@
 												ContentTemplateSelector="{Binding Model.Root.Manager.DocumentTitleTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}" />
 										</avalonDockControls:DropDownControlArea>
 									</Border>
+									<TextBox x:Name="PART_TitleEditor"
+										Margin="2,0,2,0"
+										VerticalAlignment="Center"
+										HorizontalAlignment="Left"
+										shell:WindowChrome.IsHitTestVisibleInChrome="True"
+										Visibility="Collapsed"
+										Background="Transparent"
+										Foreground="{TemplateBinding TextElement.Foreground}"
+										BorderThickness="0,0,0,1"
+										CaretBrush="{TemplateBinding TextElement.Foreground}" />
 									<Button
 										Grid.Column="1"
 										shell:WindowChrome.IsHitTestVisibleInChrome="True"
@@ -1015,6 +1025,10 @@
 						<DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource Self}}" Value="True">
 							<Setter TargetName="WindowBorder" Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
 						</DataTrigger>
+						<Trigger Property="IsEditingTitle" Value="True">
+							<Setter TargetName="PART_TitleContent" Property="Visibility" Value="Collapsed" />
+							<Setter TargetName="PART_TitleEditor" Property="Visibility" Value="Visible" />
+						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>
@@ -1058,7 +1072,7 @@
 										<ColumnDefinition Width="Auto" />
 									</Grid.ColumnDefinitions>
 
-									<Border Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
+									<Border x:Name="PART_TitleContent" Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
 										<avalonDockControls:DropDownControlArea DropDownContextMenu="{Binding Model.Root.Manager.AnchorableContextMenu, RelativeSource={RelativeSource TemplatedParent}}" DropDownContextMenuDataContext="{Binding Path=SingleContentLayoutItem, RelativeSource={RelativeSource TemplatedParent}}">
 											<ContentPresenter
 												Content="{Binding Model.SinglePane.SelectedContent, RelativeSource={RelativeSource TemplatedParent}}"

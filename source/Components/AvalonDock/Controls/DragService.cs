@@ -293,6 +293,7 @@ namespace AvalonDock.Controls
 		/// </summary>
 		private void GetOverlayWindowHosts()
 		{
+			if (_floatingWindow.IsDockingLocked) return;
 			if (_manager.Layout.RootPanel.CanDock)
 			{
 				_manager.GetOverlayWindowHostsByZOrder(ref _overlayWindowHosts, _floatingWindow);
