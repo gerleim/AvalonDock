@@ -118,12 +118,16 @@ namespace AvalonDock.Controls
 		#endregion IsEditingTitle
 
 		private TextBox _titleEditor;
+		private FrameworkElement _titleTextElement;
 
 		/// <inheritdoc />
 		public override void OnApplyTemplate()
 		{
 			base.OnApplyTemplate();
 			_titleEditor = GetTemplateChild("PART_TitleEditor") as TextBox;
+			// VS2013 theme uses PART_TitleText (TextBlock), other themes use PART_TitleContent (Border or ContentPresenter)
+			_titleTextElement = GetTemplateChild("PART_TitleText") as FrameworkElement
+				?? GetTemplateChild("PART_TitleContent") as FrameworkElement;
 			if (_titleEditor != null)
 			{
 				_titleEditor.KeyDown += TitleEditor_KeyDown;
@@ -174,6 +178,21 @@ namespace AvalonDock.Controls
 			IsEditingTitle = false;
 		}
 
+		private bool IsHitOnTitleText()
+		{
+			if (_titleTextElement == null || !_titleTextElement.IsVisible) return false;
+
+			try
+			{
+				var screenPos = Win32Helper.GetMousePosition();
+				var point = _titleTextElement.PointFromScreen(screenPos);
+				return point.X >= 0 && point.Y >= 0
+					&& point.X <= _titleTextElement.DesiredSize.Width
+					&& point.Y <= _titleTextElement.ActualHeight;
+			}
+			catch { return false; }
+		}
+
 		protected override void OnInitialized(EventArgs e)
 		{
 			base.OnInitialized(e);
@@ -195,7 +214,7 @@ namespace AvalonDock.Controls
 			switch (msg)
 			{
 				case Win32Helper.WM_NCLBUTTONDBLCLK:
-					if (wParam.ToInt32() == Win32Helper.HT_CAPTION)
+					if (wParam.ToInt32() == Win32Helper.HT_CAPTION && IsHitOnTitleText())
 					{
 						Dispatcher.BeginInvoke(new Action(BeginEditTitle));
 						handled = true;
