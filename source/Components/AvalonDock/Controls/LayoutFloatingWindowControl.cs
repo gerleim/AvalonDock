@@ -19,6 +19,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 using AvalonDock.Layout;
 using AvalonDock.Themes;
@@ -817,7 +818,7 @@ namespace AvalonDock.Controls
 				_wpfContentHost = new HwndSource(new HwndSourceParameters
 				{
 					ParentWindow = hwndParent.Handle,
-					WindowStyle = Win32Helper.WS_CHILD | Win32Helper.WS_VISIBLE | Win32Helper.WS_CLIPSIBLINGS | Win32Helper.WS_CLIPCHILDREN,
+					WindowStyle = Win32Helper.WS_CHILD | Win32Helper.WS_CLIPSIBLINGS | Win32Helper.WS_CLIPCHILDREN,
 					Width = 1,
 					Height = 1,
 					UsesPerPixelOpacity = true,
@@ -827,6 +828,17 @@ namespace AvalonDock.Controls
 				AutomationProperties.SetName(_rootPresenter, "FloatingWindowHost");
 				_rootPresenter.SetBinding(Border.BackgroundProperty, new Binding(nameof(Background)) { Source = _owner });
 				_wpfContentHost.RootVisual = _rootPresenter;
+
+				// Defer showing the child window until after WPF renders content,
+				// to avoid a transparent flash when UsesPerPixelOpacity is enabled.
+				var childHandle = _wpfContentHost.Handle;
+				_wpfContentHost.Dispatcher.BeginInvoke(new Action(() =>
+				{
+					Win32Helper.SetWindowPos(childHandle, IntPtr.Zero, 0, 0, 0, 0,
+						Win32Helper.SetWindowPosFlags.IgnoreMove | Win32Helper.SetWindowPosFlags.IgnoreResize |
+						Win32Helper.SetWindowPosFlags.IgnoreZOrder | Win32Helper.SetWindowPosFlags.ShowWindow);
+				}), DispatcherPriority.Loaded);
+
 				_manager = _owner.Model.Root.Manager;
 				_manager.InternalAddLogicalChild(_rootPresenter);
 				return new HandleRef(this, _wpfContentHost.Handle);
