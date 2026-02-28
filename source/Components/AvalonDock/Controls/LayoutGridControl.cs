@@ -340,9 +340,106 @@ namespace AvalonDock.Controls
 			var trToWnd = TransformToAncestor(rootVisual);
 			var transformedDelta = trToWnd.Transform(new Point(e.HorizontalChange, e.VerticalChange)) - trToWnd.Transform(new Point());
 			if (Orientation == System.Windows.Controls.Orientation.Horizontal)
-				Canvas.SetLeft(_resizerGhost, MathHelper.MinMax(_initialStartPoint.X + transformedDelta.X, 0.0, _resizerWindowHost.Width - _resizerGhost.Width));
+			{
+				var candidatePos = MathHelper.MinMax(_initialStartPoint.X + transformedDelta.X, 0.0, _resizerWindowHost.Width - _resizerGhost.Width);
+				if (!Keyboard.IsKeyDown(Key.LeftAlt) && !Keyboard.IsKeyDown(Key.RightAlt))
+					candidatePos = SnapToSibling(candidatePos, isHorizontal: true);
+				Canvas.SetLeft(_resizerGhost, candidatePos);
+			}
 			else
-				Canvas.SetTop(_resizerGhost, MathHelper.MinMax(_initialStartPoint.Y + transformedDelta.Y, 0.0, _resizerWindowHost.Height - _resizerGhost.Height));
+			{
+				var candidatePos = MathHelper.MinMax(_initialStartPoint.Y + transformedDelta.Y, 0.0, _resizerWindowHost.Height - _resizerGhost.Height);
+				if (!Keyboard.IsKeyDown(Key.LeftAlt) && !Keyboard.IsKeyDown(Key.RightAlt))
+					candidatePos = SnapToSibling(candidatePos, isHorizontal: false);
+				Canvas.SetTop(_resizerGhost, candidatePos);
+			}
+		}
+
+		private double SnapToSibling(double candidatePos, bool isHorizontal)
+		{
+			var manager = _model?.Root?.Manager;
+			if (manager == null) return candidatePos;
+			var threshold = manager.SplitterSnapThreshold;
+			if (threshold <= 0) return candidatePos;
+
+			var siblingPositions = GetSiblingSplitterScreenPositions(isHorizontal);
+			if (siblingPositions.Count == 0) return candidatePos;
+
+			// Convert candidate ghost position to screen coordinates
+			var ghostScreenPos = isHorizontal
+				? _resizerWindowHost.Left + candidatePos + _resizerGhost.Width / 2
+				: _resizerWindowHost.Top + candidatePos + _resizerGhost.Height / 2;
+
+			var bestDistance = double.MaxValue;
+			var bestScreenPos = ghostScreenPos;
+			foreach (var sibPos in siblingPositions)
+			{
+				var dist = Math.Abs(ghostScreenPos - sibPos);
+				if (dist < bestDistance)
+				{
+					bestDistance = dist;
+					bestScreenPos = sibPos;
+				}
+			}
+
+			if (bestDistance < threshold)
+			{
+				// Convert snapped screen position back to ghost-local position
+				return isHorizontal
+					? bestScreenPos - _resizerWindowHost.Left - _resizerGhost.Width / 2
+					: bestScreenPos - _resizerWindowHost.Top - _resizerGhost.Height / 2;
+			}
+
+			return candidatePos;
+		}
+
+		private List<double> GetSiblingSplitterScreenPositions(bool isHorizontal)
+		{
+			var positions = new List<double>();
+			var parent = _model.Parent as ILayoutOrientableGroup;
+			if (parent == null) return positions;
+
+			var ourOrientation = Orientation;
+			foreach (var sibling in parent.Children)
+			{
+				if (sibling == _model) continue;
+				if (sibling is not ILayoutOrientableGroup siblingOrientable) continue;
+				if (siblingOrientable.Orientation != ourOrientation) continue;
+
+				// Find the visual control for this sibling layout model
+				var manager = _model.Root?.Manager;
+				if (manager == null) continue;
+
+				var siblingGridControl = FindLayoutGridControlForModel(manager, sibling);
+				if (siblingGridControl == null) continue;
+
+				foreach (var child in siblingGridControl.Children)
+				{
+					if (child is not LayoutGridResizerControl splitter) continue;
+					if (!splitter.IsVisible) continue;
+
+					try
+					{
+						var splitterScreenPos = splitter.PointToScreen(new Point(splitter.ActualWidth / 2, splitter.ActualHeight / 2));
+						positions.Add(isHorizontal ? splitterScreenPos.X : splitterScreenPos.Y);
+					}
+					catch
+					{
+						// Splitter may not be connected to PresentationSource yet
+					}
+				}
+			}
+
+			return positions;
+		}
+
+		private static LayoutGridControl<T> FindLayoutGridControlForModel(DependencyObject root, ILayoutElement model)
+		{
+			foreach (var control in root.FindVisualChildren<LayoutGridControl<T>>())
+			{
+				if (control.Model == model) return control;
+			}
+			return null;
 		}
 
 		private void OnSplitterDragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)

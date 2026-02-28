@@ -1129,6 +1129,22 @@ namespace AvalonDock
 
 		#endregion GridSplitterHeight
 
+		#region SplitterSnapThreshold
+
+		/// <summary><see cref="SplitterSnapThreshold"/> dependency property.</summary>
+		public static readonly DependencyProperty SplitterSnapThresholdProperty = DependencyProperty.Register(nameof(SplitterSnapThreshold), typeof(double), typeof(DockingManager),
+				new FrameworkPropertyMetadata(15.0));
+
+		/// <summary>Gets/sets the pixel distance at which a splitter snaps to align with a sibling splitter. Set to 0 to disable snapping.</summary>
+		[Bindable(true), Description("Gets/sets the pixel distance at which a splitter snaps to align with a sibling splitter"), Category("Other")]
+		public double SplitterSnapThreshold
+		{
+			get => (double)GetValue(SplitterSnapThresholdProperty);
+			set => SetValue(SplitterSnapThresholdProperty, value);
+		}
+
+		#endregion SplitterSnapThreshold
+
 		#region GridSplitterVerticalStyle
 
 		/// <summary>
