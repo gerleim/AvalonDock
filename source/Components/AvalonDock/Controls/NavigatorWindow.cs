@@ -65,7 +65,8 @@ namespace AvalonDock.Controls
 				.OrderByDescending(d => d.LastActivationTimeStamp.GetValueOrDefault())
 				.Select(d => (LayoutAnchorableItem)_manager.GetLayoutItemFromModel(d))
 				.ToArray());
-			SetDocuments(_manager.Layout.Descendents()
+			SetValue(HasAnchorablesPropertyKey, Anchorables?.Any() == true);
+		SetDocuments(_manager.Layout.Descendents()
 				.OfType<LayoutDocument>()
 				.OrderByDescending(d => d.LastActivationTimeStamp.GetValueOrDefault())
 				.Select(d => (LayoutDocumentItem)_manager.GetLayoutItemFromModel(d))
@@ -105,6 +106,20 @@ namespace AvalonDock.Controls
 		#endregion Constructors
 
 		#region Properties
+
+		#region HasAnchorables
+
+		/// <summary><see cref="HasAnchorables"/> read-only dependency property.</summary>
+		private static readonly DependencyPropertyKey HasAnchorablesPropertyKey =
+			DependencyProperty.RegisterReadOnly(nameof(HasAnchorables), typeof(bool), typeof(NavigatorWindow),
+				new FrameworkPropertyMetadata(false));
+
+		public static readonly DependencyProperty HasAnchorablesProperty = HasAnchorablesPropertyKey.DependencyProperty;
+
+		/// <summary>Gets whether there are any visible anchorables.</summary>
+		public bool HasAnchorables => (bool)GetValue(HasAnchorablesProperty);
+
+		#endregion HasAnchorables
 
 		#region Documents
 

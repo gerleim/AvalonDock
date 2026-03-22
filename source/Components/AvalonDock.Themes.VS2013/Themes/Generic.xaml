@@ -2756,7 +2756,7 @@
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition />
                                         </Grid.ColumnDefinitions>
-                                        <Grid Margin="5">
+                                        <Grid x:Name="PART_AnchorablePanel" Margin="5">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition />
@@ -2849,6 +2849,9 @@
                         </Border>
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="HasAnchorables" Value="False">
+                            <Setter TargetName="PART_AnchorablePanel" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
                         <Trigger Property="SelectedDocument" Value="{x:Null}">
                             <Setter TargetName="selectedElementTitle" Property="Text" Value="{Binding SelectedAnchorable.LayoutElement.Title}" />
                             <Setter TargetName="selectedElementDescription" Property="Text" Value="{x:Null}" />
