@@ -269,6 +269,7 @@ namespace AvalonDock.Controls
 
 		private void Container_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
+			e.Handled = true;
 			var item = (ListBoxItem)sender;
 			if (item.DataContext is LayoutDocumentItem document)
 			{
@@ -284,8 +285,11 @@ namespace AvalonDock.Controls
 				_internalSetSelectedAnchorable = false;
 				_isSelectingDocument = false;
 			}
-			CloseAndActiveSelected();
-			e.Handled = true;
+			// Only close — don't activate here. Activation is deferred to
+			// DockingManager.ShowNavigatorWindow after ShowDialog returns,
+			// so it runs after WPF's modal focus restoration completes.
+			Deactivated -= OnDeactivated;
+			Close();
 		}
 
 		private void AnchorablesItemContainer_IsKeyboardFocusedChanged(object sender, DependencyPropertyChangedEventArgs e)
