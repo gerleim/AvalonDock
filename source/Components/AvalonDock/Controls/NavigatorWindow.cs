@@ -252,6 +252,7 @@ namespace AvalonDock.Controls
 						ListBoxItem container = (ListBoxItem)generator.ContainerFromItem(item);
 						if (container != null)
 						{
+							container.PreviewMouseLeftButtonDown += Container_PreviewMouseLeftButtonDown;
 							if (isListOfDocuments)
 							{
 								container.IsKeyboardFocusedChanged += DocumentsItemContainer_IsKeyboardFocusedChanged;
@@ -264,6 +265,27 @@ namespace AvalonDock.Controls
 					}
 					break;
 			}
+		}
+
+		private void Container_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			var item = (ListBoxItem)sender;
+			if (item.DataContext is LayoutDocumentItem document)
+			{
+				_internalSetSelectedDocument = true;
+				SelectedDocument = document;
+				_internalSetSelectedDocument = false;
+				_isSelectingDocument = true;
+			}
+			else if (item.DataContext is LayoutAnchorableItem anchorable)
+			{
+				_internalSetSelectedAnchorable = true;
+				SelectedAnchorable = anchorable;
+				_internalSetSelectedAnchorable = false;
+				_isSelectingDocument = false;
+			}
+			CloseAndActiveSelected();
+			e.Handled = true;
 		}
 
 		private void AnchorablesItemContainer_IsKeyboardFocusedChanged(object sender, DependencyPropertyChangedEventArgs e)
