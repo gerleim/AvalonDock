@@ -4,6 +4,15 @@ A WPF docking layout library for building IDE-like interfaces with document and 
 
 This is a maintained fork of [Dirkster99/AvalonDock](https://github.com/Dirkster99/AvalonDock) targeting **.NET 8**, with additional bug fixes and enhancements.
 
+## Key changes from upstream
+- Retargeted to .NET 8 (`net8.0-windows`)
+- Floating window improvements: inline title editing, docking lock toggle button, fix for transparent flash on startup layout restore
+- Navigator window: mouse click selection, hide anchorables panel when no tool windows visible
+- Fix tab order corruption in DocumentPaneTabPanel on overflow
+- Fix drag-to-float broken by FilterMessage handled flag override
+- Snap-to-sibling splitter behavior
+- Persist floating window titles with layout serialization
+
 ## Features
 
 - Drag-and-drop document and tool window docking
