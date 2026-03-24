@@ -2759,13 +2759,18 @@ namespace AvalonDock
 			if (_navigatorWindow == null)
 				_navigatorWindow = new NavigatorWindow(this) { Owner = Window.GetWindow(this), WindowStartupLocation = WindowStartupLocation.CenterOwner };
 			_navigatorWindow.ShowDialog();
-			// Activate the selected item after ShowDialog returns, so it runs
-			// after WPF's modal focus restoration (important for mouse-click activation).
-			if (_navigatorWindow.SelectedDocument is { } doc && doc.ActivateCommand.CanExecute(null))
-				doc.ActivateCommand.Execute(null);
-			else if (_navigatorWindow.SelectedAnchorable is { } anc && anc.ActivateCommand.CanExecute(null))
-				anc.ActivateCommand.Execute(null);
+			// Activate the selected item via BeginInvoke so it runs after
+			// WPF's modal focus restoration completes (needed for mouse-click activation).
+			var selectedDoc = _navigatorWindow.SelectedDocument;
+			var selectedAnc = _navigatorWindow.SelectedAnchorable;
 			_navigatorWindow = null;
+			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Input, () =>
+			{
+				if (selectedDoc != null && selectedDoc.ActivateCommand.CanExecute(null))
+					selectedDoc.ActivateCommand.Execute(null);
+				else if (selectedAnc != null && selectedAnc.ActivateCommand.CanExecute(null))
+					selectedAnc.ActivateCommand.Execute(null);
+			});
 		}
 
 		private LayoutFloatingWindowControl CreateFloatingWindowForLayoutAnchorableWithoutParent(LayoutAnchorablePane paneModel, bool isContentImmutable)
