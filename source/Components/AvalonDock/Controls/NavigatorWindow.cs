@@ -51,7 +51,9 @@ namespace AvalonDock.Controls
 		static NavigatorWindow()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(NavigatorWindow), new FrameworkPropertyMetadata(typeof(NavigatorWindow)));
+			ShowActivatedProperty.OverrideMetadata(typeof(NavigatorWindow), new FrameworkPropertyMetadata(false));
 			ShowInTaskbarProperty.OverrideMetadata(typeof(NavigatorWindow), new FrameworkPropertyMetadata(false));
+			WindowStyleProperty.OverrideMetadata(typeof(NavigatorWindow), new FrameworkPropertyMetadata(WindowStyle.None));
 		}
 
 		internal NavigatorWindow(DockingManager manager)
@@ -178,8 +180,7 @@ namespace AvalonDock.Controls
 				return;
 			}
 
-			Close();
-			SelectedDocument.ActivateCommand.Execute(null);
+			CloseOnly();
 		}
 
 		#endregion SelectedDocument
@@ -205,12 +206,9 @@ namespace AvalonDock.Controls
 		protected virtual void OnSelectedAnchorableChanged(DependencyPropertyChangedEventArgs e)
 		{
 			if (_internalSetSelectedAnchorable) return;
-			// TODO: What goes on here??
-			var selectedAnchorable = e.NewValue as LayoutAnchorableItem;
 			if (SelectedAnchorable != null && SelectedAnchorable.ActivateCommand.CanExecute(null))
 			{
-				Close();
-				SelectedAnchorable.ActivateCommand.Execute(null);
+				CloseOnly();
 			}
 		}
 
@@ -421,7 +419,7 @@ namespace AvalonDock.Controls
 		{
 			if (!(e.Key == Key.Tab || e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down))
 			{
-				CloseAndActiveSelected();
+				CloseOnly();
 				e.Handled = true;
 			}
 			base.OnKeyUp(e);
@@ -544,6 +542,9 @@ namespace AvalonDock.Controls
 		private void OnLoaded(object sender, RoutedEventArgs e)
 		{
 			Loaded -= OnLoaded;
+			// Activate manually since ShowActivated=false prevents auto-activation.
+			// Safe here because the window is already visible — no owner-deactivation flash.
+			Activate();
 			if (_documentListBox != null && SelectedDocument != null)
 			{
 				FocusSelectedItem(_documentListBox);
@@ -559,17 +560,13 @@ namespace AvalonDock.Controls
 
 		private void OnDeactivated(object sender, EventArgs e)
 		{
-			CloseAndActiveSelected();
+			CloseOnly();
 		}
 
-		private void CloseAndActiveSelected()
+		private void CloseOnly()
 		{
 			Deactivated -= OnDeactivated;
 			Close();
-			if (SelectedDocument != null && SelectedDocument.ActivateCommand.CanExecute(null))
-				SelectedDocument.ActivateCommand.Execute(null);
-			if (SelectedDocument == null && SelectedAnchorable != null && SelectedAnchorable.ActivateCommand.CanExecute(null))
-				SelectedAnchorable.ActivateCommand.Execute(null);
 		}
 
 		private void FocusSelectedItem(ListBox list)

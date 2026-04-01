@@ -2758,11 +2758,16 @@ namespace AvalonDock
 		{
 			if (_navigatorWindow == null)
 				_navigatorWindow = new NavigatorWindow(this) { Owner = Window.GetWindow(this), WindowStartupLocation = WindowStartupLocation.CenterOwner };
-			_navigatorWindow.ShowDialog();
-			// Activate the selected item via BeginInvoke so it runs after
-			// WPF's modal focus restoration completes (needed for mouse-click activation).
-			var selectedDoc = _navigatorWindow.SelectedDocument;
-			var selectedAnc = _navigatorWindow.SelectedAnchorable;
+			_navigatorWindow.Closed += OnNavigatorWindowClosed;
+			_navigatorWindow.Show();
+		}
+
+		private void OnNavigatorWindowClosed(object sender, EventArgs e)
+		{
+			var nav = (NavigatorWindow)sender;
+			nav.Closed -= OnNavigatorWindowClosed;
+			var selectedDoc = nav.SelectedDocument;
+			var selectedAnc = nav.SelectedAnchorable;
 			_navigatorWindow = null;
 			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Input, () =>
 			{

@@ -2688,7 +2688,7 @@
     </Style>
 
     <Style x:Key="{x:Type avalonDockControls:NavigatorWindow}" TargetType="{x:Type avalonDockControls:NavigatorWindow}">
-        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
+        <Setter Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.NavigatorWindowBackground}}" />
         <Setter Property="SizeToContent" Value="WidthAndHeight" />
         <Setter Property="ResizeMode" Value="NoResize" />
         <!--<Setter Property="shell:WindowChrome.WindowChrome">
