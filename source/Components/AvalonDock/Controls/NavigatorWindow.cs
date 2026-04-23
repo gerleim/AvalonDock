@@ -318,7 +318,7 @@ namespace AvalonDock.Controls
 			{
 				// Press Tab to switch Selected LayoutContent.
 				case Key.Tab:
-					SetNextLayoutContent(true);
+					SetNextLayoutContent(!Keyboard.Modifiers.HasFlag(ModifierKeys.Shift));
 					e.Handled = true;
 					break;
 				case Key.Left:
