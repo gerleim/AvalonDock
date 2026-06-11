@@ -507,16 +507,30 @@ namespace AvalonDock.Layout
 			do
 			{
 				exitFlag = true;
-				//for each pane that is empty
-				foreach (var paneGroupToCollapse in this.Descendents().OfType<LayoutDocumentPaneGroup>().Where(p => p.ChildrenCount == 1 && p.Children[0] is LayoutDocumentPaneGroup).ToArray())
+				foreach (var paneGroupToCollapse in this.Descendents().OfType<LayoutDocumentPaneGroup>().Where(p => p.ChildrenCount == 1).ToArray())
 				{
-					var singleChild = paneGroupToCollapse.Children[0] as LayoutDocumentPaneGroup;
-					paneGroupToCollapse.Orientation = singleChild.Orientation;
-					while (singleChild.ChildrenCount > 0)
-						paneGroupToCollapse.InsertChildAt(paneGroupToCollapse.ChildrenCount, singleChild.Children[0]);
-					paneGroupToCollapse.RemoveChild(singleChild);
-					exitFlag = false;
-					break;
+					if (paneGroupToCollapse.Children[0] is LayoutDocumentPaneGroup singleChildGroup)
+					{
+						paneGroupToCollapse.Orientation = singleChildGroup.Orientation;
+						while (singleChildGroup.ChildrenCount > 0)
+							paneGroupToCollapse.InsertChildAt(paneGroupToCollapse.ChildrenCount, singleChildGroup.Children[0]);
+						paneGroupToCollapse.RemoveChild(singleChildGroup);
+						exitFlag = false;
+						break;
+					}
+					else if (paneGroupToCollapse.Parent is not LayoutDocumentFloatingWindow)
+					{
+						// Single non-group child (e.g. LayoutDocumentPane) — replace the
+						// wrapper group with the child directly so its fixed DockWidth
+						// doesn't prevent the pane from filling available space.
+						// Skip when parent is a floating window — it requires a PaneGroup as RootPanel.
+						var singleChild = paneGroupToCollapse.Children[0];
+						paneGroupToCollapse.RemoveChild(singleChild);
+						var parentContainer = paneGroupToCollapse.Parent as ILayoutGroup;
+						parentContainer?.ReplaceChild(paneGroupToCollapse, singleChild);
+						exitFlag = false;
+						break;
+					}
 				}
 			}
 			while (!exitFlag);
