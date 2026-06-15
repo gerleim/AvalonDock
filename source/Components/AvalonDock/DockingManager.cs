@@ -2112,7 +2112,7 @@ namespace AvalonDock
 
 			SetupAutoHideWindow();
 
-			foreach (var fwc in _fwHiddenList)
+			foreach (var fwc in _fwHiddenList.ToArray())
 			{
 				fwc.EnableBindings();
 				if (fwc.KeepContentVisibleOnClose)
@@ -2126,7 +2126,7 @@ namespace AvalonDock
 			_fwHiddenList.Clear();
 
 			// load floating windows not already loaded! (issue #59 & #254 & #426)
-			foreach (var fw in Layout.FloatingWindows.Where(fw => !_fwList.Any(fwc => fwc.Model == fw)))
+			foreach (var fw in Layout.FloatingWindows.Where(fw => !_fwList.Any(fwc => fwc.Model == fw)).ToArray())
 				CreateUIElementForModel(fw);
 
 			//create the overlaywindow if it's possible
@@ -2140,6 +2140,10 @@ namespace AvalonDock
 		/// <param name="e"></param>
 		private void OnSizeChanged(object sender, SizeChangedEventArgs e)
 		{
+			if (LayoutRootPanel == null || RightSidePanel == null || LeftSidePanel == null
+				|| TopSidePanel == null || BottomSidePanel == null)
+				return;
+
 			// Lets make sure this always remains non-negative to avoid crach in layout system
 			var width = Math.Max(ActualWidth - GridSplitterWidth - RightSidePanel.ActualWidth - LeftSidePanel.ActualWidth, 0);
 			var height = Math.Max(ActualHeight - GridSplitterHeight - TopSidePanel.ActualHeight - BottomSidePanel.ActualHeight, 0);

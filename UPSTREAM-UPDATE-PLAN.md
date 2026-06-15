@@ -37,6 +37,18 @@ See [UPSTREAM-DELTA.md](UPSTREAM-DELTA.md) § "Fork-specific customizations" —
 ### 5. ~~DockingManager.ExecuteCloseAll/CloseAllButThis — floating documents~~
 **Status:** Already identical — fork already handles `LayoutDocumentFloatingWindow`. No change needed.
 
+### 6. DockingManager.OnSizeChanged() — null checks
+**File:** `DockingManager.cs`
+**Upstream fix:** Adds null checks for `LayoutRootPanel`, `RightSidePanel`, `LeftSidePanel`, `TopSidePanel`, `BottomSidePanel` before accessing their properties.
+**Why:** Prevents NullReferenceException during early layout passes when panels haven't been initialized yet.
+**Status:** Done
+
+### 7. DockingManager_Loaded() — collection iteration safety
+**File:** `DockingManager.cs`
+**Upstream fix:** Adds `.ToArray()` on `_fwHiddenList` and `Layout.FloatingWindows.Where(...)` before iterating, since the loop body modifies the collections.
+**Why:** Prevents collection-modified-during-iteration exceptions.
+**Status:** Done
+
 ## Decisions made
 
 ### Skip upstream v5 architectural projects
