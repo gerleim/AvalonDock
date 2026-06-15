@@ -219,9 +219,8 @@ namespace AvalonDock
 				RightSidePanel = CreateUIElementForModel(Layout.RightSide) as LayoutAnchorSideControl;
 				BottomSidePanel = CreateUIElementForModel(Layout.BottomSide) as LayoutAnchorSideControl;
 
-				foreach (var fw in Layout.FloatingWindows.ToArray())
-					if (fw.IsValid)
-						_fwList.Add(CreateUIElementForModel(fw) as LayoutFloatingWindowControl);
+				foreach (var fw in Layout.FloatingWindows.Where(x => x.IsValid).ToArray())
+					CreateUIElementForModel(fw);
 
 				foreach (var fw in _fwList.ToArray())
 				{
@@ -1622,6 +1621,23 @@ namespace AvalonDock
 			return CreateFloatingWindowCore(contentModel, isContentImmutable);
 		}
 
+		/// <summary>
+		/// Creates visual controls for any floating windows in the layout model
+		/// that don't have a corresponding <see cref="LayoutFloatingWindowControl"/> yet.
+		/// Call after programmatically adding a <see cref="LayoutFloatingWindow"/> to
+		/// <see cref="LayoutRoot.FloatingWindows"/>.
+		/// </summary>
+		public void CreateMissingFloatingWindowControls()
+		{
+			if (Layout == null) return;
+			foreach (var fw in Layout.FloatingWindows.Where(fw => !_fwList.Any(fwc => fwc.Model == fw)).ToArray())
+			{
+				var fwc = CreateUIElementForModel(fw);
+				if (fwc is LayoutFloatingWindowControl ctrl)
+					LayoutFloatingWindowControlCreated?.Invoke(this, new LayoutFloatingWindowControlCreatedEventArgs(ctrl));
+			}
+		}
+
 		#endregion Public Methods
 
 		#region Internal Methods
@@ -1706,10 +1722,11 @@ namespace AvalonDock
 						newFW.Show();
 					else
 						newFW.Hide();
+
+					if (panegroup != null && panegroup.IsMaximized)
+						newFW.WindowState = WindowState.Maximized;
 				}), DispatcherPriority.Send);
 
-				if (panegroup != null && panegroup.IsMaximized)
-					newFW.WindowState = WindowState.Maximized;
 				return newFW;
 			}
 
