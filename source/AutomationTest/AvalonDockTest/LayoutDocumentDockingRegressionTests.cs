@@ -47,7 +47,6 @@ namespace AvalonDockTest
 		}
 
 		[Test]
-		[Ignore("Upstream fix for #551 not yet ported — DockAsDocument doesn't handle cleaned-up PreviousContainer")]
 		public void DockAsDocument_UsesDockedPaneWhenLastFocusedDocumentIsFloating_Issue551()
 		{
 			var hostDocument = new LayoutDocument { Title = "Host", ContentId = "host" };
