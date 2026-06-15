@@ -59,7 +59,7 @@ namespace AvalonDock.Controls
 
 		public static Point TransformToDeviceDPI(this Visual visual, Point pt)
 		{
-			var compositionTarget = PresentationSource.FromVisual(visual).CompositionTarget;
+			var compositionTarget = PresentationSource.FromVisual(visual)?.CompositionTarget;
 			if (compositionTarget == null)
 				return default;
 			Matrix m = compositionTarget.TransformToDevice;
@@ -68,13 +68,19 @@ namespace AvalonDock.Controls
 
 		public static Size TransformFromDeviceDPI(this Visual visual, Size size)
 		{
-			Matrix m = PresentationSource.FromVisual(visual).CompositionTarget.TransformToDevice;
+			var compositionTarget = PresentationSource.FromVisual(visual)?.CompositionTarget;
+			if (compositionTarget == null)
+				return size;
+			Matrix m = compositionTarget.TransformToDevice;
 			return new Size(size.Width * m.M11, size.Height * m.M22);
 		}
 
 		public static Point TransformFromDeviceDPI(this Visual visual, Point pt)
 		{
-			Matrix m = PresentationSource.FromVisual(visual).CompositionTarget.TransformToDevice;
+			var compositionTarget = PresentationSource.FromVisual(visual)?.CompositionTarget;
+			if (compositionTarget == null)
+				return pt;
+			Matrix m = compositionTarget.TransformToDevice;
 			return new Point(pt.X * m.M11, pt.Y * m.M22);
 		}
 
