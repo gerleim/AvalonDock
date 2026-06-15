@@ -1,16 +1,16 @@
-﻿namespace AvalonDockTest
+namespace AvalonDockTest
 {
 	using System;
 	using System.Windows.Controls;
 
-	using Microsoft.VisualStudio.TestTools.UnitTesting;
+	using NUnit.Framework;
 
 	using AvalonDock.Layout;
 
-	[TestClass]
+	[TestFixture]
 	public sealed class DockingUtilitiesTest
 	{
-		[TestMethod]
+		[Test]
 		public void CalculatedDockMinWidthHeightTest()
 		{
 			double defaultDockMinHeight = 25;
@@ -66,7 +66,7 @@
 			Assert.AreEqual(anchorablePaneDockMinHeight, layoutPanel.CalculatedDockMinHeight());
 		}
 
-		[TestMethod]
+		[Test]
 		public void UpdateDocMinWidthHeightTest()
 		{
 			double documentPaneDockMinHeight = 100;

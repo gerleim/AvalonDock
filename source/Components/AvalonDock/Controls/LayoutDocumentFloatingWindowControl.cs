@@ -242,7 +242,8 @@ namespace AvalonDock.Controls
 
 		private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
-			if (e.PropertyName == nameof(LayoutDocumentFloatingWindow.RootPanel) && _model.RootPanel == null) InternalClose();
+			if (e.PropertyName == nameof(LayoutDocumentFloatingWindow.RootPanel) && _model.RootPanel == null)
+				Dispatcher.BeginInvoke(new Action(() => InternalClose()));
 		}
 
 		/// <inheritdoc />
@@ -331,7 +332,8 @@ namespace AvalonDock.Controls
 
 		private void RootPanelOnChildrenCollectionChanged(object sender, EventArgs e)
 		{
-			if (_model.RootPanel == null || _model.RootPanel.Children.Count == 0) InternalClose();
+			if (_model.RootPanel == null || _model.RootPanel.Children.Count == 0)
+				Dispatcher.BeginInvoke(new Action(() => InternalClose()));
 		}
 
 		private bool OpenContextMenu()

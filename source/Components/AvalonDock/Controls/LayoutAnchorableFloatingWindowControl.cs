@@ -292,7 +292,8 @@ namespace AvalonDock.Controls
 			switch (e.PropertyName)
 			{
 				case nameof(LayoutAnchorableFloatingWindow.RootPanel):
-					if (_model.RootPanel == null) InternalClose();
+					if (_model.RootPanel == null)
+						Dispatcher.BeginInvoke(new Action(() => InternalClose()));
 					break;
 
 				case nameof(LayoutAnchorableFloatingWindow.IsVisible):

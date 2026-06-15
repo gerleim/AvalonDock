@@ -114,7 +114,7 @@ namespace AvalonDock.Controls
 		public void Drop(LayoutFloatingWindow floatingWindow)
 		{
 			var root = floatingWindow.Root;
-			var currentActiveContent = floatingWindow.Root.ActiveContent;
+			var currentActiveContent = root?.ActiveContent;
 			var fwAsAnchorable = floatingWindow as LayoutAnchorableFloatingWindow;
 
 			if (fwAsAnchorable != null)
