@@ -33,14 +33,17 @@ These upstream v5 projects are not used by the fork and not relevant to adopt.
 Changes in our fork that are not in upstream and must be preserved during any merge.
 
 1. **Floating window InternalClose deferral** — `Dispatcher.BeginInvoke` to prevent ObservableCollection reentrancy during drag-drop (LayoutDocumentFloatingWindowControl, LayoutAnchorableFloatingWindowControl)
-2. **DropTarget null-safe ActiveContent** — null-conditional on `root?.ActiveContent`
-3. **Navigator window mouse click selection** — added mouse click to select items in navigator
-4. **Navigator window hide empty anchorables panel** — hides panel when no tool windows visible
-5. **Navigator window deferred activation** — `Dispatcher.BeginInvoke` for activation after ShowDialog
-6. **Snap-to-sibling splitter behavior** — splitter snaps to adjacent sibling edges
-7. **Floating window title persistence** — titles saved/restored with layout serialization
-8. **Floating window transparent flash fix** — prevents transparent flash on startup layout restore
-9. **Tab order corruption fix** — DocumentPaneTabPanel tab ordering
-10. **Drag-to-float FilterMessage fix** — FilterMessage handling during drag-to-float
-11. **NuGet rebranding** — package IDs renamed to Raisin.AvalonDock
-12. **Single-child pane group collapse** — collapses groups with stale DockWidth
+2. **Floating window inline title editing** — PART_TitleEditor TextBox for renaming floating windows
+3. **Floating window docking lock** — IsDockingLocked property and toggle button on floating windows
+4. **Floating window title persistence** — titles saved/restored with layout serialization
+5. **Floating window transparent flash fix** — prevents transparent flash on startup layout restore
+6. **DropTarget null-safe ActiveContent** — null-conditional on `root?.ActiveContent`
+7. **Navigator window mouse click selection** — added mouse click to select items in navigator
+8. **Navigator window hide empty anchorables panel** — hides panel when no tool windows visible
+9. **Navigator window deferred activation** — `Dispatcher.BeginInvoke` for activation after ShowDialog
+10. **Navigator window Shift+Tab** — backwards cycling in navigator
+11. **Snap-to-sibling splitter behavior** — splitter snaps to adjacent sibling edges
+12. **Tab order corruption fix** — DocumentPaneTabPanel tab ordering
+13. **Drag-to-float FilterMessage fix** — FilterMessage handling during drag-to-float
+14. **Single-child pane group collapse** — collapses groups with stale DockWidth
+15. **NuGet rebranding** — package IDs renamed to Raisin.AvalonDock
