@@ -2,7 +2,7 @@
 
 A WPF docking layout library for building IDE-like interfaces with document and tool window management — similar to Visual Studio, Eclipse, and PhotoShop.
 
-This is a maintained fork of [Dirkster99/AvalonDock](https://github.com/Dirkster99/AvalonDock) (forked at v4.72.0), targeting **.NET 8** with bug fixes and enhancements. See [UPSTREAM-DELTA.md](UPSTREAM-DELTA.md) for the full fork-vs-upstream comparison.
+This is a maintained fork of [Dirkster99/AvalonDock](https://github.com/Dirkster99/AvalonDock) (forked at v4.72.0), targeting **.NET 8** with bug fixes and enhancements.
 
 ## Fork-specific enhancements
 
