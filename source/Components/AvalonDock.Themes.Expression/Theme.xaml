@@ -1540,15 +1540,6 @@
 		<Setter Property="Foreground" Value="{DynamicResource AvalonDock_Expression_BaseColor2}" />
 		<Setter Property="SizeToContent" Value="WidthAndHeight" />
 		<Setter Property="ResizeMode" Value="NoResize" />
-		<Setter Property="shell:WindowChrome.WindowChrome">
-			<Setter.Value>
-				<shell:WindowChrome
-					CaptionHeight="16"
-					CornerRadius="0"
-					GlassFrameThickness="4"
-					ResizeBorderThickness="10" />
-			</Setter.Value>
-		</Setter>
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type avalonDockControls:NavigatorWindow}">
@@ -1663,6 +1654,15 @@
 												ItemContainerStyle="{StaticResource AvalonDock_Expression_NavigatorWindowListBoxItemStyle}"
 												ItemsSource="{Binding Documents}"
 												SelectedItem="{Binding SelectedDocument, Mode=TwoWay}">
+												<ListBox.GroupStyle>
+													<GroupStyle>
+														<GroupStyle.HeaderTemplate>
+															<DataTemplate>
+																<TextBlock Text="{Binding Name}" FontSize="11" Opacity="0.7" Margin="0,4,0,2" />
+															</DataTemplate>
+														</GroupStyle.HeaderTemplate>
+													</GroupStyle>
+												</ListBox.GroupStyle>
 												<ListBox.ItemTemplate>
 													<DataTemplate>
 														<Grid Margin="0,2,0,2">

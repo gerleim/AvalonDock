@@ -1767,6 +1767,15 @@
 												ItemContainerStyle="{StaticResource AvalonDock_ThemeAero_NavigatorWindowListBoxItemStyle}"
 												ItemsSource="{Binding Documents}"
 												SelectedItem="{Binding SelectedDocument, Mode=TwoWay}">
+												<ListBox.GroupStyle>
+													<GroupStyle>
+														<GroupStyle.HeaderTemplate>
+															<DataTemplate>
+																<TextBlock Text="{Binding Name}" FontSize="11" Opacity="0.7" Margin="0,4,0,2" />
+															</DataTemplate>
+														</GroupStyle.HeaderTemplate>
+													</GroupStyle>
+												</ListBox.GroupStyle>
 												<ListBox.ItemTemplate>
 													<DataTemplate>
 														<Grid>

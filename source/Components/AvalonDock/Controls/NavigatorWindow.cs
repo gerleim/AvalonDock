@@ -251,11 +251,7 @@ namespace AvalonDock.Controls
 			{
 				_documentListBox.ItemContainerGenerator.StatusChanged += ItemContainerGenerator_StatusChanged;
 				if (_hasMultipleWindows)
-				{
 					_documentListBox.Items.GroupDescriptions.Add(new PropertyGroupDescription(null, new DocumentWindowGroupConverter()));
-					if (_documentListBox.GroupStyle.Count == 0)
-						_documentListBox.GroupStyle.Add(CreateGroupStyle());
-				}
 			}
 		}
 
@@ -546,18 +542,6 @@ namespace AvalonDock.Controls
 		}
 
 		private void OnUnloaded(object sender, RoutedEventArgs e) => Unloaded -= OnUnloaded;
-
-		private static GroupStyle CreateGroupStyle()
-		{
-			var template = new DataTemplate();
-			var factory = new FrameworkElementFactory(typeof(System.Windows.Controls.TextBlock));
-			factory.SetBinding(System.Windows.Controls.TextBlock.TextProperty, new Binding("Name"));
-			factory.SetValue(System.Windows.Controls.TextBlock.FontSizeProperty, 11.0);
-			factory.SetValue(System.Windows.Controls.TextBlock.OpacityProperty, 0.7);
-			factory.SetValue(FrameworkElement.MarginProperty, new Thickness(0, 4, 0, 2));
-			template.VisualTree = factory;
-			return new GroupStyle { HeaderTemplate = template };
-		}
 
 		#endregion Private Methods
 
