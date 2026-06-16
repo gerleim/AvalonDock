@@ -134,6 +134,12 @@ See [UPSTREAM-DELTA.md](UPSTREAM-DELTA.md) § "Fork-specific customizations" —
 **Feature:** Adds four events on DockingManager: `ContentFloating` (cancelable), `ContentFloated`, `ContentDocking` (cancelable), `ContentDocked`. Raised from `StartDraggingFloatingWindowForContent`, `StartDraggingFloatingWindowForPane`, `ExecuteFloatCommand`, `ExecuteDockCommand`, and `ExecuteDockAsDocumentCommand`.
 **Status:** Done
 
+### 17. ResizeBorderThickness property for floating windows (#544)
+**Upstream commit:** `47c4e16`
+**File:** `Controls/LayoutFloatingWindowControl.cs`
+**Feature:** Adds `ResizeBorderThickness` DP that overrides `WindowChrome.ResizeBorderThickness` at load time and dynamically when changed. Enables programmatic control of the resize grip area without template overrides.
+**Status:** Done
+
 ## Decisions made
 
 ### Skip upstream v5 architectural projects

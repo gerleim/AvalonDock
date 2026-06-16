@@ -44,6 +44,7 @@ This is a maintained fork of [Dirkster99/AvalonDock](https://github.com/Dirkster
 - Auto-hide anchor double-click dock and right-click context menu (#517) — opt-in DPs on DockingManager
 - OnActivated PresentationSource retry (#517) — prevents InvalidOperationException in multi-DPI drag-to-float
 - Float/Dock lifecycle events (#545) — cancelable ContentFloating/ContentDocking events on DockingManager
+- ResizeBorderThickness property (#544) — programmatic control of floating window resize grip
 
 ## Installation
 
