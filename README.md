@@ -45,6 +45,7 @@ This is a maintained fork of [Dirkster99/AvalonDock](https://github.com/Dirkster
 - OnActivated PresentationSource retry (#517) — prevents InvalidOperationException in multi-DPI drag-to-float
 - Float/Dock lifecycle events (#545) — cancelable ContentFloating/ContentDocking events on DockingManager
 - ResizeBorderThickness property (#544) — programmatic control of floating window resize grip
+- AllowMovingFloatingWindowWithKeyboard (#542) — arrow-key movement for floating windows
 
 ## Installation
 

@@ -140,6 +140,12 @@ See [UPSTREAM-DELTA.md](UPSTREAM-DELTA.md) § "Fork-specific customizations" —
 **Feature:** Adds `ResizeBorderThickness` DP that overrides `WindowChrome.ResizeBorderThickness` at load time and dynamically when changed. Enables programmatic control of the resize grip area without template overrides.
 **Status:** Done
 
+### 18. AllowMovingFloatingWindowWithKeyboard (#542)
+**Upstream commit:** `655bfa2`
+**Files:** `Controls/LayoutFloatingWindowControl.cs`, `DockingManager.cs`
+**Feature:** Adds `AllowMovingFloatingWindowWithKeyboard` DP on DockingManager (default `false`). When enabled, arrow keys move floating windows by 10px per keystroke. Improves keyboard accessibility.
+**Status:** Done
+
 ## Decisions made
 
 ### Skip upstream v5 architectural projects

@@ -1439,6 +1439,22 @@ namespace AvalonDock
 
 		#endregion AutoWindowSizeWhenOpened
 
+		#region AllowMovingFloatingWindowWithKeyboard
+
+		/// <summary><see cref="AllowMovingFloatingWindowWithKeyboard"/> dependency property.</summary>
+		public static readonly DependencyProperty AllowMovingFloatingWindowWithKeyboardProperty =
+			DependencyProperty.Register(nameof(AllowMovingFloatingWindowWithKeyboard), typeof(bool), typeof(DockingManager), new PropertyMetadata(false));
+
+		/// <summary>Gets/sets whether floating windows can be moved using arrow keys when focused.</summary>
+		[Bindable(true), Description("Gets/sets whether floating windows can be moved using arrow keys when focused."), Category("FloatingWindow")]
+		public bool AllowMovingFloatingWindowWithKeyboard
+		{
+			get => (bool)GetValue(AllowMovingFloatingWindowWithKeyboardProperty);
+			set => SetValue(AllowMovingFloatingWindowWithKeyboardProperty, value);
+		}
+
+		#endregion AllowMovingFloatingWindowWithKeyboard
+
 		#endregion Public Properties
 
 		#region LogicalChildren
