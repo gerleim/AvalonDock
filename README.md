@@ -40,6 +40,7 @@ This is a maintained fork of [Dirkster99/AvalonDock](https://github.com/Dirkster
 - Null-safety (#554): OverlayWindow areaElement null guard for unknown drop area types
 - Remove invalid IsFloating check in CollectGarbage (#451) — fixes stale PreviousContainer references and pane leaks
 - Stable pane insertion order (#556) — prevents wrong position when docking right/bottom
+- LayoutDocumentTabItem null-safety (#517) — prevents NRE on disconnected model during tab click/reorder
 - OnActivated PresentationSource retry (#517) — prevents InvalidOperationException in multi-DPI drag-to-float
 
 ## Installation

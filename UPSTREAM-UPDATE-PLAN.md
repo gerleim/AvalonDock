@@ -108,7 +108,13 @@ See [UPSTREAM-DELTA.md](UPSTREAM-DELTA.md) § "Fork-specific customizations" —
 **Fix:** When dropping a document to the Right or Bottom, `IndexOfChild(targetModel)` could return -1 if the target moved during drag. The old code used that raw index, inserting at position 0 instead of the end. Fix computes `insertToIndex = targetIndex < 0 ? Children.Count : targetIndex + 1` and clamps to `Children.Count`.
 **Status:** Done
 
-### 12. OnActivated PresentationSource retry for multi-DPI (#517)
+### 12. LayoutDocumentTabItem null-safety (#517)
+**Upstream commit:** `b5957c4`
+**File:** `Controls/LayoutDocumentTabItem.cs`
+**Fix:** Adds `Model != null` check before `Model.IsActive = true` in `OnMouseLeftButtonDown`, and null-conditional `containerPane?.Parent` and `containerPane?.MoveChild()` during tab reorder. Prevents NRE when model is disconnected.
+**Status:** Done
+
+### 13. OnActivated PresentationSource retry for multi-DPI (#517)
 **Upstream commit:** `b5957c4`
 **File:** `Controls/LayoutFloatingWindowControl.cs`
 **Fix:** When dragging a panel to float, `OnActivated` calls `PointToScreenDPI` which requires a connected `PresentationSource`. In multi-DPI setups the window may not be fully initialized yet, causing `InvalidOperationException`. Fix adds a null check with async retry (up to 5 times, 10ms delay) and also guards the DPI recalculation branch.
