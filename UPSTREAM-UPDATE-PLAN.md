@@ -75,6 +75,27 @@ See [UPSTREAM-DELTA.md](UPSTREAM-DELTA.md) § "Fork-specific customizations" —
 
 **8e. CloseInternal null Parent guard** — Already in our fork (item #1). No change needed.
 
+### 9. Null-safety in drag/drop path (#554)
+**Upstream commit:** `0d6bd81`
+**What:** Null-safety improvements across drag/drop and pane activation code.
+
+**9a. UpdateDragPosition null guard**
+**File:** `Controls/LayoutFloatingWindowControl.cs`
+**Fix:** Adds `if (Model?.Root?.Manager == null) return;` before creating DragService. Prevents NRE when dragging a floating window disconnected from the layout tree.
+**Status:** Done
+
+**9b. SelectedContent null checks in pane activation helpers**
+**File:** `Controls/LayoutFloatingWindowControlHelper.cs`
+**Fix:** Adds `SelectedContent != null &&` before accessing `SelectedContent.IsActive` in both anchorable and document pane activation.
+**Status:** Done
+
+**9c. OverlayWindow areaElement null guard**
+**File:** `Controls/OverlayWindow.cs`
+**Fix:** Adds `if (areaElement == null) return;` before setting Canvas position on drop area element.
+**Status:** Done
+
+**9d–f. DragService, DockingManager, LayoutAnchorable** — Already in our fork (items #4, #7, #3). No change needed.
+
 ## Decisions made
 
 ### Skip upstream v5 architectural projects

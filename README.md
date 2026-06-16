@@ -35,6 +35,9 @@ This is a maintained fork of [Dirkster99/AvalonDock](https://github.com/Dirkster
 - Xceed backport (#541): PointToScreenDPI null safety — prevents NRE on disconnected visuals
 - Xceed backport (#541): Vertical drag buffer for tab reorder — prevents accidental floating when reordering tabs
 - Xceed backport (#541): Soften FixupLayout — skip missing PreviousContainer references instead of throwing
+- Null-safety (#554): UpdateDragPosition guard for disconnected floating windows
+- Null-safety (#554): SelectedContent null check in pane activation helpers
+- Null-safety (#554): OverlayWindow areaElement null guard for unknown drop area types
 
 ## Installation
 
