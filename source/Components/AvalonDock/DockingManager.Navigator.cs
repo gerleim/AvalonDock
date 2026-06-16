@@ -43,6 +43,20 @@ namespace AvalonDock
 
 		protected override void OnPreviewKeyDown(KeyEventArgs e)
 		{
+			HandleNavigatorKeyDown(e);
+			if (!e.Handled)
+				base.OnPreviewKeyDown(e);
+		}
+
+		protected override void OnPreviewKeyUp(KeyEventArgs e)
+		{
+			HandleNavigatorKeyUp(e);
+			if (!e.Handled)
+				base.OnPreviewKeyUp(e);
+		}
+
+		internal void HandleNavigatorKeyDown(KeyEventArgs e)
+		{
 			if (IsNavigatorWindowActive)
 			{
 				_navigatorWindow.HandleKeyDown(e);
@@ -60,18 +74,14 @@ namespace AvalonDock
 					}
 				}
 			}
-
-			base.OnPreviewKeyDown(e);
 		}
 
-		protected override void OnPreviewKeyUp(KeyEventArgs e)
+		internal void HandleNavigatorKeyUp(KeyEventArgs e)
 		{
 			if (IsNavigatorWindowActive)
 			{
 				_navigatorWindow.HandleKeyUp(e);
-				if (e.Handled) return;
 			}
-			base.OnPreviewKeyUp(e);
 		}
 
 		private void ShowNavigatorWindow()

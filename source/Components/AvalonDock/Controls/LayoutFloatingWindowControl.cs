@@ -672,7 +672,12 @@ namespace AvalonDock.Controls
 		{
 			base.OnPreviewKeyDown(e);
 			var manager = Model?.Root?.Manager;
-			if (manager == null || !manager.AllowMovingFloatingWindowWithKeyboard)
+			if (manager == null) return;
+
+			manager.HandleNavigatorKeyDown(e);
+			if (e.Handled) return;
+
+			if (!manager.AllowMovingFloatingWindowWithKeyboard)
 				return;
 
 			switch (e.Key)
@@ -694,6 +699,12 @@ namespace AvalonDock.Controls
 					e.Handled = true;
 					break;
 			}
+		}
+
+		protected override void OnPreviewKeyUp(KeyEventArgs e)
+		{
+			base.OnPreviewKeyUp(e);
+			Model?.Root?.Manager?.HandleNavigatorKeyUp(e);
 		}
 
 		private void OnUnloaded(object sender, RoutedEventArgs e)
