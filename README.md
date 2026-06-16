@@ -46,6 +46,7 @@ This is a maintained fork of [Dirkster99/AvalonDock](https://github.com/Dirkster
 - Float/Dock lifecycle events (#545) — cancelable ContentFloating/ContentDocking events on DockingManager
 - ResizeBorderThickness property (#544) — programmatic control of floating window resize grip
 - AllowMovingFloatingWindowWithKeyboard (#542) — arrow-key movement for floating windows
+- Customizable NavigatorWindow labels (#543) — AnchorablesLabel/DocumentsLabel DPs for localization
 
 ## Installation
 

@@ -168,6 +168,38 @@ namespace AvalonDock.Controls
 
 		#endregion Anchorables
 
+		#region AnchorablesLabel
+
+		/// <summary><see cref="AnchorablesLabel"/> dependency property.</summary>
+		public static readonly DependencyProperty AnchorablesLabelProperty = DependencyProperty.Register(nameof(AnchorablesLabel), typeof(string), typeof(NavigatorWindow),
+				new FrameworkPropertyMetadata(Properties.Resources.Active_ToolWindows));
+
+		/// <summary>Gets/sets the label displayed above the anchorables list in the navigator.</summary>
+		[Bindable(true), Description("Gets/sets the label displayed above the anchorables list in the navigator."), Category("Navigator")]
+		public string AnchorablesLabel
+		{
+			get => (string)GetValue(AnchorablesLabelProperty);
+			set => SetValue(AnchorablesLabelProperty, value);
+		}
+
+		#endregion AnchorablesLabel
+
+		#region DocumentsLabel
+
+		/// <summary><see cref="DocumentsLabel"/> dependency property.</summary>
+		public static readonly DependencyProperty DocumentsLabelProperty = DependencyProperty.Register(nameof(DocumentsLabel), typeof(string), typeof(NavigatorWindow),
+				new FrameworkPropertyMetadata(Properties.Resources.Active_Files));
+
+		/// <summary>Gets/sets the label displayed above the documents list in the navigator.</summary>
+		[Bindable(true), Description("Gets/sets the label displayed above the documents list in the navigator."), Category("Navigator")]
+		public string DocumentsLabel
+		{
+			get => (string)GetValue(DocumentsLabelProperty);
+			set => SetValue(DocumentsLabelProperty, value);
+		}
+
+		#endregion DocumentsLabel
+
 		#region SelectedDocument
 
 		/// <summary><see cref="SelectedDocument"/> dependency property.</summary>

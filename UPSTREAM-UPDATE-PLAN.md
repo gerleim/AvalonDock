@@ -146,6 +146,12 @@ See [UPSTREAM-DELTA.md](UPSTREAM-DELTA.md) § "Fork-specific customizations" —
 **Feature:** Adds `AllowMovingFloatingWindowWithKeyboard` DP on DockingManager (default `false`). When enabled, arrow keys move floating windows by 10px per keystroke. Improves keyboard accessibility.
 **Status:** Done
 
+### 19. Customizable NavigatorWindow labels (#543)
+**Upstream commit:** `4a46d5f`
+**Files:** `Controls/NavigatorWindow.cs`, `Themes/generic.xaml`
+**Feature:** Adds `AnchorablesLabel` and `DocumentsLabel` DPs to NavigatorWindow, defaulting to the existing resource strings. generic.xaml binds to these properties instead of hardcoded `{x:Static}` resource references. Enables localization and customization of Ctrl+Tab navigator section headers.
+**Status:** Done
+
 ## Decisions made
 
 ### Skip upstream v5 architectural projects
