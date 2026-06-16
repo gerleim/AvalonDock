@@ -96,7 +96,13 @@ See [UPSTREAM-DELTA.md](UPSTREAM-DELTA.md) § "Fork-specific customizations" —
 
 **9d–f. DragService, DockingManager, LayoutAnchorable** — Already in our fork (items #4, #7, #3). No change needed.
 
-### 10. Stable pane insertion order for DocumentPaneDockRight/Bottom (#556)
+### 10. Remove invalid IsFloating check in LayoutRoot.CollectGarbage (#451)
+**Upstream commit:** `f827146`
+**File:** `Layout/LayoutRoot.cs`
+**Fix:** Removes `&& !c.IsFloating` from both the PreviousContainer clearing loop and the empty-pane removal check. The old code only cleared stale references for non-floating content, leaving floating content with PreviousContainer references to empty panes — preventing GC of those panes and causing potential layout corruption.
+**Status:** Done
+
+### 11. Stable pane insertion order for DocumentPaneDockRight/Bottom (#556)
 **Upstream commit:** `269cd28`
 **File:** `Controls/DocumentPaneDropTarget.cs`
 **Fix:** When dropping a document to the Right or Bottom, `IndexOfChild(targetModel)` could return -1 if the target moved during drag. The old code used that raw index, inserting at position 0 instead of the end. Fix computes `insertToIndex = targetIndex < 0 ? Children.Count : targetIndex + 1` and clamps to `Children.Count`.

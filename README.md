@@ -38,6 +38,7 @@ This is a maintained fork of [Dirkster99/AvalonDock](https://github.com/Dirkster
 - Null-safety (#554): UpdateDragPosition guard for disconnected floating windows
 - Null-safety (#554): SelectedContent null check in pane activation helpers
 - Null-safety (#554): OverlayWindow areaElement null guard for unknown drop area types
+- Remove invalid IsFloating check in CollectGarbage (#451) — fixes stale PreviousContainer references and pane leaks
 - Stable pane insertion order (#556) — prevents wrong position when docking right/bottom
 
 ## Installation
