@@ -152,6 +152,12 @@ See [UPSTREAM-DELTA.md](UPSTREAM-DELTA.md) § "Fork-specific customizations" —
 **Feature:** Adds `AnchorablesLabel` and `DocumentsLabel` DPs to NavigatorWindow, defaulting to the existing resource strings. generic.xaml binds to these properties instead of hardcoded `{x:Static}` resource references. Enables localization and customization of Ctrl+Tab navigator section headers.
 **Status:** Done
 
+### 20. AnchorableGridStyle for LayoutAutoHideWindowControl (#498)
+**Upstream commit:** `b32df6b`
+**File:** `Controls/LayoutAutoHideWindowControl.cs`
+**Feature:** Adds `AnchorableGridStyle` DP to style the inner Grid hosting the auto-hide pane content. Also hooks `SizeChanged` on the grid to call `InvalidateMeasure()`, fixing potential auto-hide sizing issues.
+**Status:** Done
+
 ## Decisions made
 
 ### Skip upstream v5 architectural projects

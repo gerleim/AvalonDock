@@ -47,6 +47,7 @@ This is a maintained fork of [Dirkster99/AvalonDock](https://github.com/Dirkster
 - ResizeBorderThickness property (#544) — programmatic control of floating window resize grip
 - AllowMovingFloatingWindowWithKeyboard (#542) — arrow-key movement for floating windows
 - Customizable NavigatorWindow labels (#543) — AnchorablesLabel/DocumentsLabel DPs for localization
+- AnchorableGridStyle for auto-hide window (#498) — custom style for inner Grid + InvalidateMeasure fix
 
 ## Installation
 
