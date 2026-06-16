@@ -1276,15 +1276,6 @@
 											FocusVisualStyle="{x:Null}"
 											ItemsSource="{Binding Anchorables}"
 											SelectedItem="{Binding SelectedAnchorable, Mode=TwoWay}">
-											<ListBox.GroupStyle>
-												<GroupStyle>
-													<GroupStyle.HeaderTemplate>
-														<DataTemplate>
-															<TextBlock Text="{Binding Name}" FontSize="11" Opacity="0.7" Margin="0,4,0,2" />
-														</DataTemplate>
-													</GroupStyle.HeaderTemplate>
-												</GroupStyle>
-											</ListBox.GroupStyle>
 											<ListBox.ItemContainerStyle>
 												<Style TargetType="ListBoxItem">
 													<Setter Property="Cursor" Value="Hand" />
@@ -1337,15 +1328,6 @@
 											FocusVisualStyle="{x:Null}"
 											ItemsSource="{Binding Documents}"
 											SelectedItem="{Binding SelectedDocument, Mode=TwoWay}">
-											<ListBox.GroupStyle>
-												<GroupStyle>
-													<GroupStyle.HeaderTemplate>
-														<DataTemplate>
-															<TextBlock Text="{Binding Name}" FontSize="11" Opacity="0.7" Margin="0,4,0,2" />
-														</DataTemplate>
-													</GroupStyle.HeaderTemplate>
-												</GroupStyle>
-											</ListBox.GroupStyle>
 											<ListBox.ItemContainerStyle>
 												<Style TargetType="ListBoxItem">
 													<Setter Property="Cursor" Value="Hand" />
