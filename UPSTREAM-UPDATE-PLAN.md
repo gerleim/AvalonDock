@@ -114,7 +114,15 @@ See [UPSTREAM-DELTA.md](UPSTREAM-DELTA.md) § "Fork-specific customizations" —
 **Fix:** Adds `Model != null` check before `Model.IsActive = true` in `OnMouseLeftButtonDown`, and null-conditional `containerPane?.Parent` and `containerPane?.MoveChild()` during tab reorder. Prevents NRE when model is disconnected.
 **Status:** Done
 
-### 13. OnActivated PresentationSource retry for multi-DPI (#517)
+### 14. Auto-hide anchor double-click and right-click (#517)
+**Upstream commit:** `b5957c4`
+**Files:** `Controls/LayoutAnchorControl.cs`, `DockingManager.cs`
+**Feature:** Adds two opt-in DPs on DockingManager (both default `false`):
+- `AllowAnchorDoubleClickDock` — double-click auto-hide tab to dock/pin it
+- `AllowAnchorRightClickContextMenu` — right-click auto-hide tab for Float/Dock/Hide context menu
+**Status:** Done
+
+### 15. OnActivated PresentationSource retry for multi-DPI (#517)
 **Upstream commit:** `b5957c4`
 **File:** `Controls/LayoutFloatingWindowControl.cs`
 **Fix:** When dragging a panel to float, `OnActivated` calls `PointToScreenDPI` which requires a connected `PresentationSource`. In multi-DPI setups the window may not be fully initialized yet, causing `InvalidOperationException`. Fix adds a null check with async retry (up to 5 times, 10ms delay) and also guards the DPI recalculation branch.
