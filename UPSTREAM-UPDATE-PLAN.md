@@ -128,6 +128,12 @@ See [UPSTREAM-DELTA.md](UPSTREAM-DELTA.md) § "Fork-specific customizations" —
 **Fix:** When dragging a panel to float, `OnActivated` calls `PointToScreenDPI` which requires a connected `PresentationSource`. In multi-DPI setups the window may not be fully initialized yet, causing `InvalidOperationException`. Fix adds a null check with async retry (up to 5 times, 10ms delay) and also guards the DPI recalculation branch.
 **Status:** Done
 
+### 16. Float/Dock lifecycle events (#545)
+**Upstream commit:** `d49db72`
+**Files:** `DockingManager.cs`, `ContentFloatingEventArgs.cs` (new), `ContentDockedEventArgs.cs` (new)
+**Feature:** Adds four events on DockingManager: `ContentFloating` (cancelable), `ContentFloated`, `ContentDocking` (cancelable), `ContentDocked`. Raised from `StartDraggingFloatingWindowForContent`, `StartDraggingFloatingWindowForPane`, `ExecuteFloatCommand`, `ExecuteDockCommand`, and `ExecuteDockAsDocumentCommand`.
+**Status:** Done
+
 ## Decisions made
 
 ### Skip upstream v5 architectural projects
