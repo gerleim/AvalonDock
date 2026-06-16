@@ -18,6 +18,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Interop;
 
 namespace AvalonDock.Controls
 {
@@ -100,7 +101,6 @@ namespace AvalonDock.Controls
 			DataContext = this;
 			Loaded += OnLoaded;
 			Unloaded += OnUnloaded;
-			Deactivated += OnDeactivated;
 			UpdateThemeResources();
 		}
 
@@ -180,7 +180,7 @@ namespace AvalonDock.Controls
 				return;
 			}
 
-			CloseOnly();
+			Close();
 		}
 
 		#endregion SelectedDocument
@@ -208,7 +208,7 @@ namespace AvalonDock.Controls
 			if (_internalSetSelectedAnchorable) return;
 			if (SelectedAnchorable != null && SelectedAnchorable.ActivateCommand.CanExecute(null))
 			{
-				CloseOnly();
+				Close();
 			}
 		}
 
@@ -217,6 +217,17 @@ namespace AvalonDock.Controls
 		#endregion Properties
 
 		#region Overrides
+
+		/// <inheritdoc />
+		protected override void OnSourceInitialized(EventArgs e)
+		{
+			base.OnSourceInitialized(e);
+			var hwnd = new WindowInteropHelper(this).Handle;
+			const int GWL_EXSTYLE = -20;
+			const int WS_EX_NOACTIVATE = 0x08000000;
+			var exStyle = Win32Helper.GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+			Win32Helper.SetWindowLongPtr(hwnd, GWL_EXSTYLE, new IntPtr(exStyle.ToInt64() | WS_EX_NOACTIVATE));
+		}
 
 		/// <inheritdoc />
 		public override void OnApplyTemplate()
@@ -282,10 +293,6 @@ namespace AvalonDock.Controls
 				_internalSetSelectedAnchorable = false;
 				_isSelectingDocument = false;
 			}
-			// Only close — don't activate here. Activation is deferred to
-			// DockingManager.ShowNavigatorWindow after ShowDialog returns,
-			// so it runs after WPF's modal focus restoration completes.
-			Deactivated -= OnDeactivated;
 			Close();
 		}
 
@@ -311,12 +318,10 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		/// <inheritdoc />
-		protected override void OnKeyDown(KeyEventArgs e)
+		internal void HandleKeyDown(KeyEventArgs e)
 		{
 			switch (e.Key)
 			{
-				// Press Tab to switch Selected LayoutContent.
 				case Key.Tab:
 					SetNextLayoutContent(!Keyboard.Modifiers.HasFlag(ModifierKeys.Shift));
 					e.Handled = true;
@@ -358,71 +363,49 @@ namespace AvalonDock.Controls
 					e.Handled = true;
 					break;
 			}
-			if (!e.Handled)
-			{
-				base.OnKeyDown(e);
-			}
 
 			void SetNextLayoutContent(bool next)
 			{
-				// Selecting LayoutDocuments
 				if (_isSelectingDocument)
 				{
 					if (SelectedDocument != null)
 					{
-						// Jump to previous/next LayoutDocument
 						if (next)
-						{
 							SelectNextDocument();
-						}
 						else
-						{
 							SelectPreviousDocument();
-						}
 					}
-					// There is no SelectedDocument, select the first one.
 					else if (Documents.Length > 0)
 					{
 						InternalSetSelectedDocument(Documents[0]);
 					}
 				}
-				// Selecting LayoutAnchorables
 				else
 				{
 					if (SelectedAnchorable != null)
 					{
-						// Jump to previous/next LayoutAnchorable
 						if (next)
-						{
 							SelectNextAnchorable();
-						}
 						else
-						{
 							SelectPreviousAnchorable();
-						}
 					}
-					// There is no SelectedAnchorable, select the first one.
 					else
 					{
-						var anchorable = Anchorables.FirstOrDefault();
-						if (anchorable != null)
-						{
-							InternalSetSelectedAnchorable(anchorable);
-						}
+						var anchorableItem = Anchorables.FirstOrDefault();
+						if (anchorableItem != null)
+							InternalSetSelectedAnchorable(anchorableItem);
 					}
 				}
 			}
 		}
 
-		/// <inheritdoc />
-		protected override void OnKeyUp(KeyEventArgs e)
+		internal void HandleKeyUp(KeyEventArgs e)
 		{
 			if (!(e.Key == Key.Tab || e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down))
 			{
-				CloseOnly();
+				Close();
 				e.Handled = true;
 			}
-			base.OnKeyUp(e);
 		}
 
 		#endregion Overrides
@@ -522,10 +505,6 @@ namespace AvalonDock.Controls
 			_internalSetSelectedAnchorable = true;
 			SelectedAnchorable = anchorableToSelect;
 			_internalSetSelectedAnchorable = false;
-			if (_anchorableListBox != null)
-			{
-				FocusSelectedItem(_anchorableListBox);
-			}
 		}
 
 		private void InternalSetSelectedDocument(LayoutDocumentItem documentToSelect)
@@ -533,53 +512,14 @@ namespace AvalonDock.Controls
 			_internalSetSelectedDocument = true;
 			SelectedDocument = documentToSelect;
 			_internalSetSelectedDocument = false;
-			if (_documentListBox != null)
-			{
-				FocusSelectedItem(_documentListBox);
-			}
 		}
 
 		private void OnLoaded(object sender, RoutedEventArgs e)
 		{
 			Loaded -= OnLoaded;
-			// Activate manually since ShowActivated=false prevents auto-activation.
-			// Safe here because the window is already visible — no owner-deactivation flash.
-			Activate();
-			if (_documentListBox != null && SelectedDocument != null)
-			{
-				FocusSelectedItem(_documentListBox);
-			}
-			else if (_anchorableListBox != null && SelectedAnchorable != null)
-			{
-				FocusSelectedItem(_anchorableListBox);
-			}
-			WindowStartupLocation = WindowStartupLocation.CenterOwner;
 		}
 
 		private void OnUnloaded(object sender, RoutedEventArgs e) => Unloaded -= OnUnloaded;
-
-		private void OnDeactivated(object sender, EventArgs e)
-		{
-			CloseOnly();
-		}
-
-		private void CloseOnly()
-		{
-			Deactivated -= OnDeactivated;
-			Close();
-		}
-
-		private void FocusSelectedItem(ListBox list)
-		{
-			if (list.SelectedIndex >= 0)
-			{
-				var listBoxItem = (ListBoxItem)list.ItemContainerGenerator.ContainerFromIndex(list.SelectedIndex);
-				if (listBoxItem != null)
-				{
-					this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded, (Func<bool>)listBoxItem.Focus);
-				}
-			}
-		}
 
 		#endregion Private Methods
 	}

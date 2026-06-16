@@ -39,7 +39,7 @@ namespace AvalonDock
 	/// <seealso cref="IOverlayWindowHost"/>
 	[ContentProperty(nameof(Layout))]
 	[TemplatePart(Name = "PART_AutoHideArea")]
-	public class DockingManager : Control, IOverlayWindowHost//, ILogicalChildrenContainer
+	public partial class DockingManager : Control, IOverlayWindowHost//, ILogicalChildrenContainer
 	{
 		#region fields
 		// ShortCut to current AvalonDock theme if OnThemeChanged() is invoked with DictionaryTheme instance
@@ -60,8 +60,6 @@ namespace AvalonDock
 
 		private bool _suspendLayoutItemCreation = false;
 		private DispatcherOperation _collectLayoutItemsOperations = null;
-		private NavigatorWindow _navigatorWindow = null;
-
 		internal bool SuspendDocumentsSourceBinding = false;
 		internal bool SuspendAnchorablesSourceBinding = false;
 
@@ -1398,22 +1396,6 @@ namespace AvalonDock
 
 		#endregion AutoWindowSizeWhenOpened
 
-		#region ShowNavigator
-
-		/// <summary><see cref="ShowNavigator"/> dependency property.</summary>
-		public static readonly DependencyProperty ShowNavigatorProperty = DependencyProperty.Register(nameof(ShowNavigator), typeof(bool), typeof(DockingManager),
-				new FrameworkPropertyMetadata(true));
-
-		/// <summary>Gets/sets whether the navigator window should be shown when the user presses Control + Tab.</summary>
-		[Bindable(true), Description("Gets/sets whether floating windows should show the system menu when a custom context menu is not defined."), Category("FloatingWindow")]
-		public bool ShowNavigator
-		{
-			get => (bool)GetValue(ShowNavigatorProperty);
-			set => SetValue(ShowNavigatorProperty, value);
-		}
-
-		#endregion ShowNavigator
-
 		#endregion Public Properties
 
 		#region LogicalChildren
@@ -1456,10 +1438,6 @@ namespace AvalonDock
 		#endregion LogicalChildren
 
 		#region Private Properties
-
-		private bool IsNavigatorWindowActive => _navigatorWindow != null;
-
-		private bool CanShowNavigatorWindow => ShowNavigator && _layoutItems.Any();
 
 		#endregion Private Properties
 
@@ -2037,23 +2015,6 @@ namespace AvalonDock
 		{
 			_areas = null;
 			return base.ArrangeOverride(arrangeBounds);
-		}
-
-		protected override void OnPreviewKeyDown(KeyEventArgs e)
-		{
-			if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
-			{
-				if (e.IsDown && e.Key == Key.Tab)
-				{
-					if (CanShowNavigatorWindow && !IsNavigatorWindowActive)
-					{
-						ShowNavigatorWindow();
-						e.Handled = true;
-					}
-				}
-			}
-
-			base.OnPreviewKeyDown(e);
 		}
 
 		#endregion Overrides
@@ -2774,30 +2735,6 @@ namespace AvalonDock
 		}
 
 		#endregion LayoutItems
-
-		private void ShowNavigatorWindow()
-		{
-			if (_navigatorWindow == null)
-				_navigatorWindow = new NavigatorWindow(this) { Owner = Window.GetWindow(this), WindowStartupLocation = WindowStartupLocation.CenterOwner };
-			_navigatorWindow.Closed += OnNavigatorWindowClosed;
-			_navigatorWindow.Show();
-		}
-
-		private void OnNavigatorWindowClosed(object sender, EventArgs e)
-		{
-			var nav = (NavigatorWindow)sender;
-			nav.Closed -= OnNavigatorWindowClosed;
-			var selectedDoc = nav.SelectedDocument;
-			var selectedAnc = nav.SelectedAnchorable;
-			_navigatorWindow = null;
-			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Input, () =>
-			{
-				if (selectedDoc != null && selectedDoc.ActivateCommand.CanExecute(null))
-					selectedDoc.ActivateCommand.Execute(null);
-				else if (selectedAnc != null && selectedAnc.ActivateCommand.CanExecute(null))
-					selectedAnc.ActivateCommand.Execute(null);
-			});
-		}
 
 		private LayoutFloatingWindowControl CreateFloatingWindowForLayoutAnchorableWithoutParent(LayoutAnchorablePane paneModel, bool isContentImmutable)
 		{

@@ -1,0 +1,119 @@
+/************************************************************************
+   AvalonDock
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the Microsoft Public
+   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
+ ************************************************************************/
+
+using AvalonDock.Controls;
+using System;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows;
+using System.Windows.Input;
+
+namespace AvalonDock
+{
+	public partial class DockingManager
+	{
+		private NavigatorWindow _navigatorWindow = null;
+
+		#region ShowNavigator
+
+		/// <summary><see cref="ShowNavigator"/> dependency property.</summary>
+		public static readonly DependencyProperty ShowNavigatorProperty = DependencyProperty.Register(nameof(ShowNavigator), typeof(bool), typeof(DockingManager),
+				new FrameworkPropertyMetadata(true));
+
+		/// <summary>Gets/sets whether the navigator window should be shown when the user presses Control + Tab.</summary>
+		[Bindable(true), Description("Gets/sets whether floating windows should show the system menu when a custom context menu is not defined."), Category("FloatingWindow")]
+		public bool ShowNavigator
+		{
+			get => (bool)GetValue(ShowNavigatorProperty);
+			set => SetValue(ShowNavigatorProperty, value);
+		}
+
+		#endregion ShowNavigator
+
+		private bool IsNavigatorWindowActive => _navigatorWindow != null;
+
+		private bool CanShowNavigatorWindow => ShowNavigator && _layoutItems.Any();
+
+		protected override void OnPreviewKeyDown(KeyEventArgs e)
+		{
+			if (IsNavigatorWindowActive)
+			{
+				_navigatorWindow.HandleKeyDown(e);
+				if (e.Handled) return;
+			}
+
+			if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+			{
+				if (e.IsDown && e.Key == Key.Tab)
+				{
+					if (CanShowNavigatorWindow && !IsNavigatorWindowActive)
+					{
+						ShowNavigatorWindow();
+						e.Handled = true;
+					}
+				}
+			}
+
+			base.OnPreviewKeyDown(e);
+		}
+
+		protected override void OnPreviewKeyUp(KeyEventArgs e)
+		{
+			if (IsNavigatorWindowActive)
+			{
+				_navigatorWindow.HandleKeyUp(e);
+				if (e.Handled) return;
+			}
+			base.OnPreviewKeyUp(e);
+		}
+
+		private void ShowNavigatorWindow()
+		{
+			if (_navigatorWindow == null)
+				_navigatorWindow = new NavigatorWindow(this) { Owner = Window.GetWindow(this), WindowStartupLocation = WindowStartupLocation.CenterOwner };
+			_navigatorWindow.Closed += OnNavigatorWindowClosed;
+			PreviewMouseDown += OnNavigatorPreviewMouseDown;
+			var parentWindow = Window.GetWindow(this);
+			if (parentWindow != null)
+				parentWindow.Deactivated += OnNavigatorParentDeactivated;
+			_navigatorWindow.Show();
+		}
+
+		private void OnNavigatorWindowClosed(object sender, EventArgs e)
+		{
+			var nav = (NavigatorWindow)sender;
+			nav.Closed -= OnNavigatorWindowClosed;
+			PreviewMouseDown -= OnNavigatorPreviewMouseDown;
+			var parentWindow = Window.GetWindow(this);
+			if (parentWindow != null)
+				parentWindow.Deactivated -= OnNavigatorParentDeactivated;
+			var selectedDoc = nav.SelectedDocument;
+			var selectedAnc = nav.SelectedAnchorable;
+			_navigatorWindow = null;
+			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Input, () =>
+			{
+				if (selectedDoc != null && selectedDoc.ActivateCommand.CanExecute(null))
+					selectedDoc.ActivateCommand.Execute(null);
+				else if (selectedAnc != null && selectedAnc.ActivateCommand.CanExecute(null))
+					selectedAnc.ActivateCommand.Execute(null);
+			});
+		}
+
+		private void OnNavigatorPreviewMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			if (_navigatorWindow != null && !_navigatorWindow.IsMouseOver)
+				_navigatorWindow.Close();
+		}
+
+		private void OnNavigatorParentDeactivated(object sender, EventArgs e)
+		{
+			_navigatorWindow?.Close();
+		}
+	}
+}
