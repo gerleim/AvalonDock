@@ -1,7 +1,7 @@
 # AvalonDock: Fork vs. Upstream Delta
 
 Upstream: [Dirkster99/AvalonDock](https://github.com/Dirkster99/AvalonDock) v5.0.0
-Fork: Raisin.AvalonDock v4.72.6 (branched from upstream ~v4.72.0)
+Fork: Raisin.AvalonDock v4.72.8 (branched from upstream ~v4.72.0)
 
 ## What the fork uses
 
