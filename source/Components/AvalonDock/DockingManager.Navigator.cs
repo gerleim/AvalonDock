@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Interop;
 
 namespace AvalonDock
 {
@@ -83,6 +84,14 @@ namespace AvalonDock
 			if (parentWindow != null)
 				parentWindow.Deactivated += OnNavigatorParentDeactivated;
 			_navigatorWindow.Show();
+			var hwnd = new WindowInteropHelper(_navigatorWindow).Handle;
+			if (hwnd != IntPtr.Zero)
+			{
+				const int GWL_EXSTYLE = -20;
+				const int WS_EX_NOACTIVATE = 0x08000000;
+				var exStyle = Win32Helper.GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+				Win32Helper.SetWindowLongPtr(hwnd, GWL_EXSTYLE, new IntPtr(exStyle.ToInt64() | WS_EX_NOACTIVATE));
+			}
 		}
 
 		private void OnNavigatorWindowClosed(object sender, EventArgs e)

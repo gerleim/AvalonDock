@@ -13,12 +13,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using System.Windows.Interop;
 
 namespace AvalonDock.Controls
 {
@@ -68,19 +69,40 @@ namespace AvalonDock.Controls
 				.Select(d => (LayoutAnchorableItem)_manager.GetLayoutItemFromModel(d))
 				.ToArray());
 			SetValue(HasAnchorablesPropertyKey, Anchorables?.Any() == true);
-		SetDocuments(_manager.Layout.Descendents()
+
+			var allDocs = _manager.Layout.Descendents()
 				.OfType<LayoutDocument>()
 				.OrderByDescending(d => d.LastActivationTimeStamp.GetValueOrDefault())
+				.ToArray();
+
+			var secondMru = allDocs.Length > 1 ? allDocs[1] : allDocs.FirstOrDefault();
+
+			var hasMultipleWindows = allDocs.Any(d => d.IsFloating) && allDocs.Any(d => !d.IsFloating);
+			if (hasMultipleWindows)
+			{
+				allDocs = allDocs
+					.OrderBy(d => d.IsFloating ? 1 : 0)
+					.ThenByDescending(d => d.LastActivationTimeStamp.GetValueOrDefault())
+					.ToArray();
+			}
+
+			SetDocuments(allDocs
 				.Select(d => (LayoutDocumentItem)_manager.GetLayoutItemFromModel(d))
 				.ToArray());
 			_internalSetSelectedDocument = false;
 
-			// if there are multiple documents, select the next document.
-			// if there is only one document, select that document.
-			// if there are no documents, select the first anchorable.
+			if (hasMultipleWindows)
+			{
+				var view = CollectionViewSource.GetDefaultView(Documents);
+				view?.GroupDescriptions.Add(new PropertyGroupDescription(null, new DocumentWindowGroupConverter()));
+			}
+
 			if (Documents.Length > 1)
 			{
-				InternalSetSelectedDocument(Documents[1]);
+				var preselect = secondMru != null
+					? Documents.FirstOrDefault(d => d.LayoutElement == secondMru)
+					: null;
+				InternalSetSelectedDocument(preselect ?? Documents[1]);
 				_isSelectingDocument = true;
 			}
 			else if (Documents.Length == 1)
@@ -217,17 +239,6 @@ namespace AvalonDock.Controls
 		#endregion Properties
 
 		#region Overrides
-
-		/// <inheritdoc />
-		protected override void OnSourceInitialized(EventArgs e)
-		{
-			base.OnSourceInitialized(e);
-			var hwnd = new WindowInteropHelper(this).Handle;
-			const int GWL_EXSTYLE = -20;
-			const int WS_EX_NOACTIVATE = 0x08000000;
-			var exStyle = Win32Helper.GetWindowLongPtr(hwnd, GWL_EXSTYLE);
-			Win32Helper.SetWindowLongPtr(hwnd, GWL_EXSTYLE, new IntPtr(exStyle.ToInt64() | WS_EX_NOACTIVATE));
-		}
 
 		/// <inheritdoc />
 		public override void OnApplyTemplate()
@@ -505,6 +516,8 @@ namespace AvalonDock.Controls
 			_internalSetSelectedAnchorable = true;
 			SelectedAnchorable = anchorableToSelect;
 			_internalSetSelectedAnchorable = false;
+			if (anchorableToSelect != null)
+				_anchorableListBox?.ScrollIntoView(anchorableToSelect);
 		}
 
 		private void InternalSetSelectedDocument(LayoutDocumentItem documentToSelect)
@@ -512,6 +525,8 @@ namespace AvalonDock.Controls
 			_internalSetSelectedDocument = true;
 			SelectedDocument = documentToSelect;
 			_internalSetSelectedDocument = false;
+			if (documentToSelect != null)
+				_documentListBox?.ScrollIntoView(documentToSelect);
 		}
 
 		private void OnLoaded(object sender, RoutedEventArgs e)
@@ -522,5 +537,24 @@ namespace AvalonDock.Controls
 		private void OnUnloaded(object sender, RoutedEventArgs e) => Unloaded -= OnUnloaded;
 
 		#endregion Private Methods
+
+		private class DocumentWindowGroupConverter : IValueConverter
+		{
+			public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+			{
+				if (value is LayoutDocumentItem item && item.LayoutElement is LayoutDocument doc && doc.IsFloating)
+				{
+					var fw = doc.FindParent<LayoutDocumentFloatingWindow>();
+					return fw?.RootPanel?.Descendents().OfType<LayoutDocument>()
+						.FirstOrDefault(d => d.IsSelected || d.IsActive)?.Title
+						?? fw?.RootPanel?.Descendents().OfType<LayoutDocument>().FirstOrDefault()?.Title
+						?? "Floating Window";
+				}
+				return "Main Window";
+			}
+
+			public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+				=> throw new NotSupportedException();
+		}
 	}
 }
