@@ -610,9 +610,23 @@ namespace AvalonDock.Controls
 			// according to OwnedByDockingManagerWindow property.
 			var manager = Model?.Root?.Manager;
 			if (OwnedByDockingManagerWindow && manager != null)
+			{
 				this.SetParentToMainWindowOf(manager);
+				CopyInputBindingsFromOwner();
+			}
 			else
+			{
 				this.SetParentWindowToNull();
+			}
+		}
+
+		private void CopyInputBindingsFromOwner()
+		{
+			if (Owner == null) return;
+
+			InputBindings.Clear();
+			foreach (InputBinding binding in Owner.InputBindings)
+				InputBindings.Add(binding);
 		}
 
 		private void OnUnloaded(object sender, RoutedEventArgs e)

@@ -31,6 +31,10 @@ This is a maintained fork of [Dirkster99/AvalonDock](https://github.com/Dirkster
 - WindowState.Maximized timing fix inside BeginInvoke (#490)
 - Remove CaptureMouse interference before WM_NCLBUTTONDOWN (#459)
 - GetSide multi-pane support for multiple anchorable panes on same side (#486)
+- Xceed backport (#541): InputBindings transfer to floating windows — keyboard shortcuts work in undocked panels
+- Xceed backport (#541): PointToScreenDPI null safety — prevents NRE on disconnected visuals
+- Xceed backport (#541): Vertical drag buffer for tab reorder — prevents accidental floating when reordering tabs
+- Xceed backport (#541): Soften FixupLayout — skip missing PreviousContainer references instead of throwing
 
 ## Installation
 

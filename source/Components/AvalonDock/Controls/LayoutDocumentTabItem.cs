@@ -205,6 +205,7 @@ namespace AvalonDock.Controls
 		{
 			_parentDocumentTabPanel = this.FindLogicalAncestor<DocumentPaneTabPanel>();
 			_parentDocumentTabPanelScreenArea = _parentDocumentTabPanel.GetScreenArea();
+			_parentDocumentTabPanelScreenArea.Inflate(0, _parentDocumentTabPanelScreenArea.Height / 2);
 			_otherTabs = _parentDocumentTabPanel.Children.Cast<TabItem>().Where(ch => ch.Visibility != Visibility.Collapsed).ToList();
 			var currentTabScreenArea = this.FindLogicalAncestor<TabItem>().GetScreenArea();
 			_otherTabsScreenArea = _otherTabs.Select(ti =>

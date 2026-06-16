@@ -49,6 +49,32 @@ See [UPSTREAM-DELTA.md](UPSTREAM-DELTA.md) § "Fork-specific customizations" —
 **Why:** Prevents collection-modified-during-iteration exceptions.
 **Status:** Done
 
+### 8. Xceed backport fixes (#541)
+**Upstream commit:** `50671cb`
+**What:** Four fixes backported from Xceed's commercial branch (v4.2–v5.0).
+
+**8a. InputBindings transfer to floating windows**
+**File:** `Controls/LayoutFloatingWindowControl.cs`
+**Fix:** Adds `CopyInputBindingsFromOwner()` that copies keyboard shortcuts from the Owner window to floating windows so hotkeys work in undocked panels.
+**Status:** Done
+
+**8b. PointToScreenDPI null safety**
+**File:** `Controls/TransformExtentions.cs`
+**Fix:** Guards `PointToScreenDPI` against disconnected visuals (PresentationSource null check). Complements the existing `TransformToDeviceDPI` and `TransformFromDeviceDPI` null checks.
+**Status:** Done
+
+**8c. Vertical drag buffer for document tab reorder**
+**File:** `Controls/LayoutDocumentTabItem.cs`
+**Fix:** `_parentDocumentTabPanelScreenArea.Inflate(0, Height/2)` adds vertical tolerance so dragging to reorder tabs doesn't accidentally trigger floating.
+**Status:** Done
+
+**8d. Soften FixupLayout on stale PreviousContainer references**
+**File:** `Layout/Serialization/LayoutSerializer.cs`
+**Fix:** Instead of throwing `ArgumentException` when a PreviousContainer pane ID is not found during deserialization, clears the reference and continues. Prevents crash with stale/edited layout files.
+**Status:** Done
+
+**8e. CloseInternal null Parent guard** — Already in our fork (item #1). No change needed.
+
 ## Decisions made
 
 ### Skip upstream v5 architectural projects
