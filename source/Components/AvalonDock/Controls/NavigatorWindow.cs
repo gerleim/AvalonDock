@@ -83,6 +83,7 @@ namespace AvalonDock.Controls
 			{
 				allDocs = allDocs
 					.OrderBy(d => d.IsFloating ? 1 : 0)
+					.ThenBy(d => d.FindParent<LayoutDocumentFloatingWindow>()?.GetHashCode() ?? 0)
 					.ThenByDescending(d => d.LastActivationTimeStamp.GetValueOrDefault())
 					.ToArray();
 			}
