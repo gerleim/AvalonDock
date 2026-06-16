@@ -412,7 +412,7 @@ namespace AvalonDock.Controls
 
 		internal void HandleKeyUp(KeyEventArgs e)
 		{
-			if (!(e.Key == Key.Tab || e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down))
+			if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
 			{
 				Close();
 				e.Handled = true;
