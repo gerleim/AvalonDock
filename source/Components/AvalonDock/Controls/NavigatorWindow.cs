@@ -333,6 +333,16 @@ namespace AvalonDock.Controls
 		{
 			switch (e.Key)
 			{
+				case Key.Enter:
+					Close();
+					e.Handled = true;
+					break;
+				case Key.Escape:
+					InternalSetSelectedDocument(null);
+					InternalSetSelectedAnchorable(null);
+					Close();
+					e.Handled = true;
+					break;
 				case Key.Tab:
 					SetNextLayoutContent(!Keyboard.Modifiers.HasFlag(ModifierKeys.Shift));
 					e.Handled = true;
