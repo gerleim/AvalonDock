@@ -124,8 +124,9 @@ namespace AvalonDock.Controls
 							paneGroup.Orientation = System.Windows.Controls.Orientation.Vertical;
 						}
 
-						var insertToIndex = paneGroup.IndexOfChild(targetModel);
-						if (insertToIndex == (paneGroup.Children.Count - 1))
+						var targetIndex = paneGroup.IndexOfChild(targetModel);
+						var insertToIndex = targetIndex < 0 ? paneGroup.Children.Count : targetIndex + 1;
+						if (insertToIndex > paneGroup.Children.Count)
 						{
 							insertToIndex = paneGroup.Children.Count;
 						}
@@ -206,8 +207,9 @@ namespace AvalonDock.Controls
 							paneGroup.Orientation = System.Windows.Controls.Orientation.Horizontal;
 						}
 
-						var insertToIndex = paneGroup.IndexOfChild(targetModel);
-						if (insertToIndex == (paneGroup.Children.Count - 1))
+						var targetIndex = paneGroup.IndexOfChild(targetModel);
+						var insertToIndex = targetIndex < 0 ? paneGroup.Children.Count : targetIndex + 1;
+						if (insertToIndex > paneGroup.Children.Count)
 						{
 							insertToIndex = paneGroup.Children.Count;
 						}

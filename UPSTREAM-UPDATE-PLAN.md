@@ -96,6 +96,12 @@ See [UPSTREAM-DELTA.md](UPSTREAM-DELTA.md) § "Fork-specific customizations" —
 
 **9d–f. DragService, DockingManager, LayoutAnchorable** — Already in our fork (items #4, #7, #3). No change needed.
 
+### 10. Stable pane insertion order for DocumentPaneDockRight/Bottom (#556)
+**Upstream commit:** `269cd28`
+**File:** `Controls/DocumentPaneDropTarget.cs`
+**Fix:** When dropping a document to the Right or Bottom, `IndexOfChild(targetModel)` could return -1 if the target moved during drag. The old code used that raw index, inserting at position 0 instead of the end. Fix computes `insertToIndex = targetIndex < 0 ? Children.Count : targetIndex + 1` and clamps to `Children.Count`.
+**Status:** Done
+
 ## Decisions made
 
 ### Skip upstream v5 architectural projects
