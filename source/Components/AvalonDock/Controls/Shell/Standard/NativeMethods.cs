@@ -18,10 +18,8 @@ namespace Standard
 	using System.ComponentModel;
 	using System.Diagnostics.CodeAnalysis;
 	using System.IO;
-	using System.Runtime.ConstrainedExecution;
 	using System.Runtime.InteropServices;
 	using System.Runtime.InteropServices.ComTypes;
-	using System.Security.Permissions;
 	using System.Text;
 
 	// Some COM interfaces and Win32 structures are already declared in the framework.
@@ -1362,7 +1360,6 @@ namespace Standard
 
 	internal sealed class SafeFindHandle : SafeHandleZeroOrMinusOneIsInvalid
 	{
-		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
 		private SafeFindHandle() : base(true) { }
 
 		/// <inheritdoc />
@@ -1413,7 +1410,7 @@ namespace Standard
 		}
 
 		/// <inheritdoc />
-		[ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+
 		protected override bool ReleaseHandle()
 		{
 			if (_created) return NativeMethods.DeleteDC(handle);
@@ -1497,7 +1494,7 @@ namespace Standard
 		}
 
 		/// <inheritdoc />
-		[ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+
 		protected override bool ReleaseHandle() => NativeMethods.DeleteObject(handle);
 	}
 
@@ -1508,7 +1505,7 @@ namespace Standard
 		}
 
 		/// <inheritdoc />
-		[ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+
 		protected override bool ReleaseHandle()
 		{
 			var s = NativeMethods.GdiplusShutdown(this.handle);
@@ -1569,7 +1566,7 @@ namespace Standard
 		}
 
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-		[ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+
 		protected override bool ReleaseHandle()
 		{
 			try
@@ -2656,7 +2653,7 @@ namespace Standard
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[DllImport("kernel32.dll")]
-		[ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool FindClose(IntPtr handle);
 
@@ -2779,7 +2776,7 @@ namespace Standard
 		public static IntPtr GetStockObject(StockObject fnObject)
 		{
 			var retPtr = _GetStockObject(fnObject);
-			if (retPtr == null) HRESULT.ThrowLastError();
+			if (retPtr == IntPtr.Zero) HRESULT.ThrowLastError();
 			return retPtr;
 		}
 
