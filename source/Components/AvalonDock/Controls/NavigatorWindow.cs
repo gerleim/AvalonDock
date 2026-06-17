@@ -46,6 +46,7 @@ namespace AvalonDock.Controls
 		private ListBox _documentListBox;
 		private bool _internalSetSelectedDocument = false;
 		private bool _internalSetSelectedAnchorable = false;
+		private bool _mouseDown;
 
 		#endregion fields
 
@@ -221,15 +222,16 @@ namespace AvalonDock.Controls
 		protected virtual void OnSelectedDocumentChanged(DependencyPropertyChangedEventArgs e)
 		{
 			if (_internalSetSelectedDocument || SelectedDocument == null)
-			{
 				return;
-			}
 
 			if (!SelectedDocument.ActivateCommand.CanExecute(null))
+				return;
+
+			if (_mouseDown)
 			{
+				_manager.IsNavigatorCloseInProgress = true;
 				return;
 			}
-
 			Close();
 		}
 
@@ -258,6 +260,11 @@ namespace AvalonDock.Controls
 			if (_internalSetSelectedAnchorable) return;
 			if (SelectedAnchorable != null && SelectedAnchorable.ActivateCommand.CanExecute(null))
 			{
+				if (_mouseDown)
+				{
+					_manager.IsNavigatorCloseInProgress = true;
+					return;
+				}
 				Close();
 			}
 		}
@@ -267,6 +274,26 @@ namespace AvalonDock.Controls
 		#endregion Properties
 
 		#region Overrides
+
+		/// <inheritdoc />
+		protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
+		{
+			_mouseDown = true;
+			base.OnPreviewMouseLeftButtonDown(e);
+		}
+
+		/// <inheritdoc />
+		protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
+		{
+			_mouseDown = false;
+			if (_manager.IsNavigatorCloseInProgress)
+			{
+				e.Handled = true;
+				Close();
+				return;
+			}
+			base.OnPreviewMouseLeftButtonUp(e);
+		}
 
 		/// <inheritdoc />
 		public override void OnApplyTemplate()
@@ -302,6 +329,7 @@ namespace AvalonDock.Controls
 						if (container != null)
 						{
 							container.PreviewMouseLeftButtonDown += Container_PreviewMouseLeftButtonDown;
+							container.PreviewMouseLeftButtonUp += Container_PreviewMouseLeftButtonUp;
 							if (isListOfDocuments)
 							{
 								container.IsKeyboardFocusedChanged += DocumentsItemContainer_IsKeyboardFocusedChanged;
@@ -318,8 +346,8 @@ namespace AvalonDock.Controls
 
 		private void Container_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			e.Handled = true;
 			var item = (ListBoxItem)sender;
+			e.Handled = true;
 			if (item.DataContext is LayoutDocumentItem document)
 			{
 				_internalSetSelectedDocument = true;
@@ -334,6 +362,11 @@ namespace AvalonDock.Controls
 				_internalSetSelectedAnchorable = false;
 				_isSelectingDocument = false;
 			}
+		}
+
+		private void Container_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+		{
+			e.Handled = true;
 			Close();
 		}
 

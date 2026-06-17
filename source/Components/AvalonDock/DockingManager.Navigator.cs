@@ -39,6 +39,8 @@ namespace AvalonDock
 
 		private bool IsNavigatorWindowActive => _navigatorWindow != null;
 
+		internal bool IsNavigatorCloseInProgress { get; set; }
+
 		private bool CanShowNavigatorWindow => ShowNavigator && _layoutItems.Any();
 
 		protected override void OnPreviewKeyDown(KeyEventArgs e)
@@ -121,6 +123,7 @@ namespace AvalonDock
 					selectedDoc.ActivateCommand.Execute(null);
 				else if (selectedAnc != null && selectedAnc.ActivateCommand.CanExecute(null))
 					selectedAnc.ActivateCommand.Execute(null);
+				IsNavigatorCloseInProgress = false;
 			});
 		}
 
@@ -132,6 +135,8 @@ namespace AvalonDock
 
 		private void OnNavigatorParentDeactivated(object sender, EventArgs e)
 		{
+			if (_navigatorWindow != null && _navigatorWindow.IsMouseOver)
+				return;
 			_navigatorWindow?.Close();
 		}
 	}

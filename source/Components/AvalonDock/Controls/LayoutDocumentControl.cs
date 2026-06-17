@@ -9,7 +9,6 @@
 
 using AvalonDock.Layout;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -110,8 +109,9 @@ namespace AvalonDock.Controls
 		/// <inheritdoc />
 		protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
 		{
-			Debug.WriteLine($"{nameof(OnPreviewMouseLeftButtonUp)}: {LayoutItem.ContentId}");
-			SetIsActive();
+			var manager = Model?.Root?.Manager;
+			if (manager == null || !manager.IsNavigatorCloseInProgress)
+				SetIsActive();
 			base.OnPreviewMouseLeftButtonUp(e);
 		}
 
