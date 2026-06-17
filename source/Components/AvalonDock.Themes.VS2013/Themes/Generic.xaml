@@ -2709,7 +2709,7 @@
 							BorderThickness="1">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="54" />
+                                    <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>

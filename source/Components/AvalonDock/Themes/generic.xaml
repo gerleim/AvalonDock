@@ -1220,9 +1220,9 @@
 							BorderThickness="3">
 							<Grid Margin="5">
 								<Grid.RowDefinitions>
-									<RowDefinition MinHeight="54" />
+									<RowDefinition Height="Auto" />
 									<RowDefinition Height="*" />
-									<RowDefinition MinHeight="42" />
+									<RowDefinition Height="Auto" />
 								</Grid.RowDefinitions>
 
 								<Grid>
