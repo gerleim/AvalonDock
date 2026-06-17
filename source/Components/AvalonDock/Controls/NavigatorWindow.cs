@@ -39,9 +39,9 @@ namespace AvalonDock.Controls
 		private const string PART_AnchorableListBox = "PART_AnchorableListBox";
 		private const string PART_DocumentListBox = "PART_DocumentListBox";
 
-		private DockingManager _manager;
+		private readonly DockingManager _manager;
 		private bool _isSelectingDocument;
-		private bool _hasMultipleWindows;
+		private readonly bool _hasMultipleWindows;
 		private ListBox _anchorableListBox;
 		private ListBox _documentListBox;
 		private bool _internalSetSelectedDocument = false;
@@ -64,12 +64,11 @@ namespace AvalonDock.Controls
 		{
 			_manager = manager;
 			_internalSetSelectedDocument = true;
-			SetAnchorables(_manager.Layout.Descendents()
+			SetAnchorables([.. _manager.Layout.Descendents()
 				.OfType<LayoutAnchorable>()
 				.Where(a => a.IsVisible)
 				.OrderByDescending(d => d.LastActivationTimeStamp.GetValueOrDefault())
-				.Select(d => (LayoutAnchorableItem)_manager.GetLayoutItemFromModel(d))
-				.ToArray());
+				.Select(d => (LayoutAnchorableItem)_manager.GetLayoutItemFromModel(d))]);
 			SetValue(HasAnchorablesPropertyKey, Anchorables?.Any() == true);
 
 			var allDocs = _manager.Layout.Descendents()
@@ -82,16 +81,14 @@ namespace AvalonDock.Controls
 			_hasMultipleWindows = allDocs.Any(d => d.IsFloating) && allDocs.Any(d => !d.IsFloating);
 			if (_hasMultipleWindows)
 			{
-				allDocs = allDocs
+				allDocs = [.. allDocs
 					.OrderBy(d => d.IsFloating ? 1 : 0)
 					.ThenBy(d => d.FindParent<LayoutDocumentFloatingWindow>()?.GetHashCode() ?? 0)
-					.ThenByDescending(d => d.LastActivationTimeStamp.GetValueOrDefault())
-					.ToArray();
+					.ThenByDescending(d => d.LastActivationTimeStamp.GetValueOrDefault())];
 			}
 
-			SetDocuments(allDocs
-				.Select(d => (LayoutDocumentItem)_manager.GetLayoutItemFromModel(d))
-				.ToArray());
+			SetDocuments([.. allDocs
+				.Select(d => (LayoutDocumentItem)_manager.GetLayoutItemFromModel(d))]);
 			_internalSetSelectedDocument = false;
 
 			if (Documents.Length > 1)
