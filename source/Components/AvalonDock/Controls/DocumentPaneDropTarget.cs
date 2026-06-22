@@ -93,8 +93,8 @@ namespace AvalonDock.Controls
 					DockHeight = targetModelAsPositionableElement.DockHeight,
 				};
 
+				layoutGroup.ReplaceChild(targetModel, paneGroup);
 				paneGroup.Children.Add(targetModel);
-				layoutGroup.InsertChildAt(0, paneGroup);
 			}
 			else if (allowMixedOrientation && paneGroup.Orientation != requiredOrientation && Type != DropTargetType.DocumentPaneDockInside)
 			{
