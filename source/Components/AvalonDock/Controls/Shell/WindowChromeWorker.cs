@@ -155,13 +155,46 @@ namespace Microsoft.Windows.Shell
 			{
 				_window.SourceInitialized += (sender, e) =>
 				{
-					_hwnd = new WindowInteropHelper(_window).Handle;
-					Assert.IsNotDefault(_hwnd);
-					_hwndSource = HwndSource.FromHwnd(_hwnd);
-					Assert.IsNotNull(_hwndSource);
-					if (_chromeInfo != null) _ApplyNewCustomChrome();
+					if (_TryAcquireHwnd()) return;
+					_window.Dispatcher.BeginInvoke(
+						(_Action)(() => _TryAcquireHwnd()),
+						DispatcherPriority.Loaded);
 				};
+				_window.Loaded += _OnWindowLoadedForChrome;
 			}
+		}
+
+		private void _OnWindowLoadedForChrome(object sender, RoutedEventArgs e)
+		{
+			_window.Loaded -= _OnWindowLoadedForChrome;
+			if (_hwnd != IntPtr.Zero && _hwndSource != null && !_hwndSource.IsDisposed) return;
+			_TryAcquireHwnd();
+		}
+
+		private bool _TryAcquireHwnd()
+		{
+			if (_hwnd == IntPtr.Zero)
+				_hwnd = new WindowInteropHelper(_window).Handle;
+			if (_hwnd == IntPtr.Zero)
+			{
+				var ps = PresentationSource.FromVisual(_window) as HwndSource;
+				if (ps != null && !ps.IsDisposed)
+				{
+					_hwnd = ps.Handle;
+					_hwndSource = ps;
+				}
+			}
+			if (_hwnd == IntPtr.Zero) return false;
+			if (_hwndSource == null || _hwndSource.IsDisposed)
+			{
+				_hwndSource = null;
+				try { _hwndSource = HwndSource.FromHwnd(_hwnd); }
+				catch (ArgumentException) { return false; }
+			}
+			if (_hwndSource == null || _hwndSource.IsDisposed) return false;
+			_window.ApplyTemplate();
+			if (_chromeInfo != null) _ApplyNewCustomChrome();
+			return true;
 		}
 
 		private void _UnsetWindow(object sender, EventArgs e)
@@ -205,6 +238,7 @@ namespace Microsoft.Windows.Shell
 		{
 			// Not yet hooked.
 			if (_hwnd == IntPtr.Zero) return;
+			if (_hwndSource == null || _hwndSource.IsDisposed) return;
 			if (_chromeInfo == null)
 			{
 				_RestoreStandardChromeState(false);
@@ -970,7 +1004,8 @@ namespace Microsoft.Windows.Shell
 			Assert.IsNotDefault(_hwnd);
 			Assert.IsNotNull(_window);
 			if (!_isHooked) return;
-			_hwndSource.RemoveHook(_WndProc);
+			if (_hwndSource != null && !_hwndSource.IsDisposed)
+				_hwndSource.RemoveHook(_WndProc);
 			_isHooked = false;
 		}
 
