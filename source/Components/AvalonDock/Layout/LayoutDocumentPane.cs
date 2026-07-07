@@ -28,6 +28,7 @@ namespace AvalonDock.Layout
 		private bool _showHeader = true;
 		private int _selectedIndex = -1;
 		private string _id;
+		private bool _isTabPanelExpanded = true;
 
 		[XmlIgnore]
 		private readonly bool _autoFixSelectedContent = true;
@@ -93,6 +94,18 @@ namespace AvalonDock.Layout
 		{
 			get => _id;
 			set => _id = value;
+		}
+
+		/// <summary>Gets/sets whether the tab panel is expanded (multi-row mode).</summary>
+		public bool IsTabPanelExpanded
+		{
+			get => _isTabPanelExpanded;
+			set
+			{
+				if (value == _isTabPanelExpanded) return;
+				_isTabPanelExpanded = value;
+				RaisePropertyChanged(nameof(IsTabPanelExpanded));
+			}
 		}
 
 		/// <summary>Gets whether the pane is hosted in a floating window.</summary>
@@ -176,6 +189,7 @@ namespace AvalonDock.Layout
 		{
 			if (_id != null) writer.WriteAttributeString(nameof(ILayoutPaneSerializable.Id), _id);
 			if (!_showHeader) writer.WriteAttributeString(nameof(ShowHeader), _showHeader.ToString());
+			if (!_isTabPanelExpanded) writer.WriteAttributeString(nameof(IsTabPanelExpanded), _isTabPanelExpanded.ToString());
 			base.WriteXml(writer);
 		}
 
@@ -184,6 +198,7 @@ namespace AvalonDock.Layout
 		{
 			if (reader.MoveToAttribute(nameof(ILayoutPaneSerializable.Id))) _id = reader.Value;
 			if (reader.MoveToAttribute(nameof(ShowHeader))) _showHeader = bool.Parse(reader.Value);
+			if (reader.MoveToAttribute(nameof(IsTabPanelExpanded))) _isTabPanelExpanded = bool.Parse(reader.Value);
 			base.ReadXml(reader);
 		}
 

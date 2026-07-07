@@ -14,6 +14,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -23,7 +24,8 @@ namespace AvalonDock.Controls
 	/// </summary>
 	public class DocumentPaneTabPanel : Panel
 	{
-		private bool _isExpanded;
+		private bool _isExpanded = true;
+		private bool _modelSynced;
 		private double _rowHeight;
 		private bool _hasOverflow;
 
@@ -31,12 +33,15 @@ namespace AvalonDock.Controls
 		{
 			FlowDirection = FlowDirection.LeftToRight;
 			Background = Brushes.Transparent;
+			Loaded += OnLoaded;
 		}
 
 		#region Overrides
 
 		protected override Size MeasureOverride(Size availableSize)
 		{
+			SyncFromModel();
+
 			_rowHeight = 0;
 			double totalWidth = 0;
 
@@ -51,10 +56,17 @@ namespace AvalonDock.Controls
 				return new Size(0, 0);
 
 			double panelWidth = double.IsInfinity(availableSize.Width) ? totalWidth : availableSize.Width;
+			bool hadOverflow = _hasOverflow;
 			_hasOverflow = totalWidth > panelWidth;
 
 			if (!_hasOverflow)
 				_isExpanded = false;
+			else if (!hadOverflow)
+			{
+				var model = FindModel();
+				if (model != null)
+					_isExpanded = model.IsTabPanelExpanded;
+			}
 
 			if (_isExpanded && _hasOverflow && panelWidth > 0)
 			{
@@ -99,12 +111,14 @@ namespace AvalonDock.Controls
 			if (e.Delta < 0 && !_isExpanded && _hasOverflow)
 			{
 				_isExpanded = true;
+				SyncToModel();
 				InvalidateMeasure();
 				e.Handled = true;
 			}
 			else if (e.Delta > 0 && _isExpanded)
 			{
 				_isExpanded = false;
+				SyncToModel();
 				InvalidateMeasure();
 				e.Handled = true;
 			}
@@ -119,6 +133,34 @@ namespace AvalonDock.Controls
 		}
 
 		#endregion Overrides
+
+		private void OnLoaded(object sender, RoutedEventArgs e)
+		{
+			_modelSynced = false;
+			SyncFromModel();
+		}
+
+		private LayoutDocumentPane FindModel()
+		{
+			var paneControl = this.FindVisualAncestor<LayoutDocumentPaneControl>();
+			return (paneControl?.Model as LayoutDocumentPane);
+		}
+
+		private void SyncFromModel()
+		{
+			if (_modelSynced) return;
+			var model = FindModel();
+			if (model == null) return;
+			_isExpanded = model.IsTabPanelExpanded;
+			_modelSynced = true;
+		}
+
+		private void SyncToModel()
+		{
+			var model = FindModel();
+			if (model != null)
+				model.IsTabPanelExpanded = _isExpanded;
+		}
 
 		private void ArrangeMultiRow(List<TabItem> tabs, Size finalSize)
 		{
