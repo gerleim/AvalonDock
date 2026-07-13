@@ -275,7 +275,7 @@ namespace AvalonDock.Controls
 				_lastFocusedElementBeforeEnterMenuMode.IsAlive)
 			{
 				var lastFocusedInputElement = _lastFocusedElementBeforeEnterMenuMode.GetValueOrDefault<UIElement>();
-				if (lastFocusedInputElement != null)
+				if (lastFocusedInputElement != null && PresentationSource.FromVisual(lastFocusedInputElement) != null)
 				{
 					if (lastFocusedInputElement != Keyboard.Focus(lastFocusedInputElement))
 						Debug.WriteLine("Unable to activate the element");
