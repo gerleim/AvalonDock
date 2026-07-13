@@ -30,6 +30,7 @@ namespace AvalonDock.Controls
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutDocumentControl), new FrameworkPropertyMetadata(typeof(LayoutDocumentControl)));
 			FocusableProperty.OverrideMetadata(typeof(LayoutDocumentControl), new FrameworkPropertyMetadata(true));
+			KeyboardNavigation.IsTabStopProperty.OverrideMetadata(typeof(LayoutDocumentControl), new FrameworkPropertyMetadata(false));
 		}
 
 		#endregion Constructors
