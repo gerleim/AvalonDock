@@ -132,11 +132,7 @@ namespace AvalonDock.Controls
 			IInputElement objectToFocus;
 			if (_modelFocusedElement.GetValue(model, out objectToFocus))
 			{
-				if (objectToFocus is Visual v && PresentationSource.FromVisual(v) == null)
-					objectToFocus = null;
-
-				if (objectToFocus != null)
-					focused = objectToFocus == Keyboard.Focus(objectToFocus);
+				focused = objectToFocus == Keyboard.Focus(objectToFocus);
 			}
 
 			IntPtr handleToFocus;
