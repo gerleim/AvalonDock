@@ -110,7 +110,9 @@ namespace AvalonDock.Controls
 		protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
 		{
 			var manager = Model?.Root?.Manager;
-			if (manager == null || !manager.IsNavigatorCloseInProgress)
+			if (manager != null && manager.SuppressMouseUpActivation)
+				manager.SuppressMouseUpActivation = false;
+			else if (manager == null || !manager.IsNavigatorCloseInProgress)
 				SetIsActive();
 			base.OnPreviewMouseLeftButtonUp(e);
 		}

@@ -41,6 +41,13 @@ namespace AvalonDock
 
 		internal bool IsNavigatorCloseInProgress { get; set; }
 
+		/// <summary>
+		/// When true, suppresses the next mouse-up activation in LayoutDocumentControl
+		/// to allow programmatic content switching without the originating pane
+		/// reclaiming activation. Auto-resets after one use.
+		/// </summary>
+		public bool SuppressMouseUpActivation { get; set; }
+
 		private bool CanShowNavigatorWindow => ShowNavigator && _layoutItems.Any();
 
 		protected override void OnPreviewKeyDown(KeyEventArgs e)
