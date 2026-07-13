@@ -14,7 +14,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using System.Windows.Media;
 
 using AvalonDock.Commands;
 using AvalonDock.Layout;
@@ -64,11 +63,7 @@ namespace AvalonDock.Controls
 			_model = model;
 			HideWindowCommand = new RelayCommand<object>(OnExecuteHideWindowCommand, CanExecuteHideWindowCommand);
 			CloseWindowCommand = new RelayCommand<object>(OnExecuteCloseWindowCommand, CanExecuteCloseWindowCommand);
-			Closed += (sender, args) =>
-			{
-				if (Owner != null && PresentationSource.FromVisual(Owner) != null)
-					Owner.Focus();
-			};
+			Closed += (sender, args) => { Owner?.Focus(); };
 			UpdateThemeResources();
 		}
 
