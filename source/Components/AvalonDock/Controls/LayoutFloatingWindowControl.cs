@@ -941,23 +941,12 @@ namespace AvalonDock.Controls
 					WindowStyle = Win32Helper.WS_CHILD | Win32Helper.WS_CLIPSIBLINGS | Win32Helper.WS_CLIPCHILDREN,
 					Width = 1,
 					Height = 1,
-					UsesPerPixelOpacity = true,
 				});
 
 				_rootPresenter = new Border { Child = new AdornerDecorator { Child = Content }, Focusable = true };
 				AutomationProperties.SetName(_rootPresenter, "FloatingWindowHost");
 				_rootPresenter.SetBinding(Border.BackgroundProperty, new Binding(nameof(Background)) { Source = _owner });
 				_wpfContentHost.RootVisual = _rootPresenter;
-
-				// Defer showing the child window until after WPF renders content,
-				// to avoid a transparent flash when UsesPerPixelOpacity is enabled.
-				var childHandle = _wpfContentHost.Handle;
-				_wpfContentHost.Dispatcher.BeginInvoke(new Action(() =>
-				{
-					Win32Helper.SetWindowPos(childHandle, IntPtr.Zero, 0, 0, 0, 0,
-						Win32Helper.SetWindowPosFlags.IgnoreMove | Win32Helper.SetWindowPosFlags.IgnoreResize |
-						Win32Helper.SetWindowPosFlags.IgnoreZOrder | Win32Helper.SetWindowPosFlags.ShowWindow);
-				}), DispatcherPriority.Loaded);
 
 				_manager = _owner.Model.Root.Manager;
 				_manager.InternalAddLogicalChild(_rootPresenter);
